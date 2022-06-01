@@ -1,0 +1,35 @@
+{
+  "name": "cobre-bem",
+  "description": "![](https://i.imgur.com/xG74tOh.png)",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon ./src/index.js",
+    "start": "node ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/carlostsa10/back-integral-m05-desafio-t05.git"
+  },
+  "author": "Bruno Mantovan, Carlos Tavares, Emanuel Brito, Nathan Renovato e Vítor Leal.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/carlostsa10/back-integral-m05-desafio-t05/issues"
+  },
+  "homepage": "https://github.com/carlostsa10/back-integral-m05-desafio-t05#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "date-fns": "^2.28.0",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^2.0.0",
+    "pg": "^8.7.3",
+    "yup": "^0.32.11",
+    "yup-locales": "^1.2.4"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.16"
+  }
+}
