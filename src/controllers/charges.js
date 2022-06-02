@@ -1,6 +1,7 @@
 const knex = require('../scripts/conection');
 const { format } = require('date-fns');
 const { errors } = require('../scripts/error-messages');
+const billingRegisterSchema = require('../validations/billingRegisterSchema');
 
 const chargesPaid = async (req, res) => {
     try {
@@ -67,7 +68,7 @@ const highlightsOverdueCollections = async (req, res) => {
             .limit(4);
 
         if (!expiredHighlight || expiredHighlight.length === 0) {
-            return res.status(200).json(0);
+            return res.status(200).json([]);
         }
 
         return res.status(200).json(expiredHighlight);
@@ -86,7 +87,7 @@ const highlightsExpectedCharges = async (req, res) => {
             .limit(4);
 
         if (!predictedHighlight || predictedHighlight.length === 0) {
-            return res.status(200).json(0);
+            return res.status(200).json([]);
         }
 
         return res.status(200).json(predictedHighlight);
@@ -104,12 +105,49 @@ const highlightsPaidCharges = async (req, res) => {
             .limit(4);
 
         if (!paidHighlights || paidHighlights.length === 0) {
-            return res.status(200).json(0);
+            return res.status(200).json([]);
         }
 
         return res.status(200).json(paidHighlights);
     } catch (error) {
         return res.status(400).json({ "message": error.message })
+    }
+}
+
+const billingRegister = async (req, res) => {
+    const { client_id } = req.params;
+    const { user_id, description, due_date, value, status } = req.body;
+
+    try {
+        const clientExist = await knex('client')
+            .where({ id: client_id })
+            .first();
+
+        if (!clientExist) {
+            return res.status(404).json({ 'error': 'não existe esse cliente' });
+        }
+
+        await billingRegisterSchema.validate(req.body);
+
+        const userExist = await knex('users')
+            .where({ id: user_id })
+            .first();
+
+        if (!userExist) {
+            return res.status(404).json({ 'error': 'não existe esse usuário' });
+        }
+
+        const newCharge = await knex('charges')
+            .insert({ user_id, client_id, value, paid: status, due_date })
+            .returning('*');
+
+        if (!newCharge) {
+            return res.status(400).json({ 'error': 'não foi possível cadastrar a cobrança' });
+        }
+
+        return res.status(201).json({ 'message': 'cobrança cadastrada com sucesso' });
+    } catch (error) {
+        return res.status(400).json({ 'message': error.message })
     }
 }
 
@@ -119,5 +157,6 @@ module.exports = {
     anticipatedCharges,
     highlightsOverdueCollections,
     highlightsExpectedCharges,
-    highlightsPaidCharges
+    highlightsPaidCharges,
+    billingRegister
 }
