@@ -1,4 +1,5 @@
 const knex = require('../scripts/conection');
+const loginSchema = require('../validations/loginSchema')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { format } = require('date-fns');
@@ -7,7 +8,7 @@ const { errors } = require('../scripts/error-messages');
 
 
 const registerCustomer = async (req, res) => {
-    const { name, email, cpf, telefone, endereco, complemento, cep, bairro, cidade, uf } = req.body;
+    const { name, email, cpf, phone, adress, cep, complement, district, city, uf } = req.body;
 
     try {
         await registerCustomerSchema.validate(req.body);
@@ -25,16 +26,7 @@ const registerCustomer = async (req, res) => {
         }
 
         const customer = await knex('users').insert({
-            nome,
-            email,
-            cpf,
-            telefone,
-            endereco,
-            complemento,
-            cep,
-            bairro,
-            cidade,
-            uf
+            name, email, cpf, phone, adress, cep, complement, district, city, uf
         });
 
         if (!customer) {
@@ -96,9 +88,9 @@ const highlightsCustomersUpToDate = async (req, res) => {
 
 const customers = async (req, res) => {
     try {
-        const allCustomers = await knex('clientes')
-            .select('nome', 'cpf', 'email', 'telefone', 'status')
-            .orderBy(asc);
+        const allCustomers = await knex('clients')
+            .select('name', 'cpf', 'email', 'phone');
+
 
         if (!allCustomers) {
             return res.status(400).json(errors.noReturnFromCustomers);
@@ -109,6 +101,22 @@ const customers = async (req, res) => {
         return res.status(400).json({ 'message': error.message });
     }
 }
+
+// const customerDetail = async (req, res) => {
+//         const {email} = req.body;
+
+//         await loginSchema.validate(req.body);
+
+//         const getUser = await knex('users')
+//             .where({email})
+//             .first();
+
+//         if (!getUser) {
+//             return res.status(400).json(errors.loginIncorrect);
+//         }
+
+//         return res.status(200).json(email);
+// }
 
 module.exports = {
     registerCustomer,

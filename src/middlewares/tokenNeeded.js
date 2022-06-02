@@ -6,8 +6,8 @@ const jwtSecret = process.env.JWT_SECRET;
 const checkLogin = async (req, res, next) => {
     const { authorization } = req.headers;
 
-    if (!authorization || authorization === 'Beare undefined') {
-        return res.status(401).json({ 'mensagem': 'O usuário precisa esta logado!' });
+    if (!authorization) {
+        return res.status(401).json({ 'mensagem': 'O usuário precisa estar logado!' });
     }
 
     try {

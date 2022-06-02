@@ -13,7 +13,7 @@ const knex = require('knex')({
             rejectUnauthorized: false,
             require: true
         }
-    },
+    }
 
 });
 

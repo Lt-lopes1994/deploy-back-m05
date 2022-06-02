@@ -8,7 +8,7 @@ const loginSchema = yup.object().shape({
 
     password: yup
         .string()
-        .length(8)
+        .min(8)
         .required()
 });
 

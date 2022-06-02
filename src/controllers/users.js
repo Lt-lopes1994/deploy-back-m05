@@ -1,24 +1,16 @@
-const env = require('dotenv');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 
 const knex = require('../scripts/conection');
 
 const { errors } = require('../scripts/error-messages');
-const { fieldsToUser, fieldsToLogin } = require('../validations/requiredFields');
-
-env.config()
-const jwtSecret = process.env.JWT_SECRET;
+const fieldsToUser = require('../validations/requiredFields');
 
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
-    const validations = fieldsToUser({ name, email, password });
-
-    if (!validations.ok) {
-        return res.status(400).json(validations.message);
-    }
 
     try {
+        await fieldsToUser.validate(req.body);
+
         const getEmail = await knex('users')
             .where({ email })
             .first();

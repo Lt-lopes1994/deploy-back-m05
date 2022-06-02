@@ -1,55 +1,20 @@
-const { errors } = require('../scripts/error-messages')
+const { object } = require('yup');
+const yup = require('./yup');
 
-const fieldsToUser = ({ name, email, password }) => {
-    if (!name) {
-        const response = {
-            message: errors.nameX,
-            ok: false
-        }
-        return response;
-    }
+const fieldsToUser = yup.object().shape({
+    name: yup
+        .string()
+        .required(),
 
-    if (!email) {
-        const response = {
-            message: errors.emailX,
-            ok: false
-        }
-        return response;
-    }
+    email: yup
+        .string()
+        .email()
+        .required(),
 
-    if (!password) {
-        const response = {
-            message: errors.passwordX,
-            ok: false
-        }
-        return response;
-    }
+    password: yup
+        .string()
+        .min(8)
+        .required()
+})
 
-    return { ok: true }
-}
-
-const fieldsToLogin = ({ email, password }) => {
-    if (!email) {
-        const response = {
-            message: errors.emailX,
-            ok: false
-        }
-        return response;
-    }
-
-    if (!password) {
-        const response = {
-            message: errors.passwordX,
-            ok: false
-        }
-        return response;
-    }
-
-    return { ok: true }
-}
-
-
-module.exports = {
-    fieldsToUser,
-    fieldsToLogin
-}
+module.exports = fieldsToUser;

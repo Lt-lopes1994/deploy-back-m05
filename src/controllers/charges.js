@@ -13,7 +13,7 @@ const chargesPaid = async (req, res) => {
             return res.status(400).json(errors.thereAreNoChargesPaid);
         }
 
-        return res.status(200).json(totalAmountBillsPaid);
+        return res.status(200).json({ 'data': totalAmountBillsPaid });
     } catch (error) {
         return res.status(400).json({ "mensagem": error.message })
     }
@@ -33,7 +33,7 @@ const overdueCharges = async (req, res) => {
             return res.status(400).json(errors.thereAreNoOverdueCharges);
         }
 
-        return res.status(200).json(totalAmountOverdueCharges);
+        return res.status(200).json({ 'data': totalAmountOverdueCharges });
     } catch (error) {
         return res.status(400).json({ 'mensagem': error.message })
     }
@@ -51,7 +51,7 @@ const anticipatedCharges = async (req, res) => {
             return res.status(400).json(errors.thereAreNoAnticipatedCharges);
         }
 
-        return res.status(200).json(totalAmountExpectedAccounts);
+        return res.status(200).json({ 'data': totalAmountExpectedAccounts });
     } catch (error) {
         return res.status(400).json({ "mensagem": error.message })
     }
@@ -70,7 +70,7 @@ const highlightsOverdueCollections = async (req, res) => {
             return res.status(400).json(errors.noReturnOverdueCharges);
         }
 
-        return res.status(200).json(expiredHighlight);
+        return res.status(200).json({ 'data': expiredHighlight });
     } catch (error) {
         return res.status(400).json({ "mensagem": error.message })
     }
@@ -89,7 +89,7 @@ const highlightsExpectedCharges = async (req, res) => {
             return res.status(400).json(errors.noReturnAnticipatedCharges);
         }
 
-        return res.status(200).json(predictedHighlight);
+        return res.status(200).json({ 'data': predictedHighlight });
     } catch (error) {
         return res.status(400).json({ "mensagem": error.message })
     }
@@ -107,7 +107,7 @@ const highlightsPaidCharges = async (req, res) => {
             return res.status(400).json(errors.noReturnBillsPaid);
         }
 
-        return res.status(200).json(paidHighlights);
+        return res.status(200).json({ 'data': paidHighlights });
     } catch (error) {
         return res.status(400).json({ "mensagem": error.message })
     }
