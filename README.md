@@ -108,8 +108,7 @@ ___
     "name": "José",
     "email": "jose@email.com",
     "cpf": "12345678910",
-    "password": "12345senha",
-    "address": "ST. D Norte QND 47, Brasília, DF, 70297-400",
+    "password": "12345senha"
 }
 ```
 ---
@@ -289,4 +288,3 @@ ___
 
 ---
 
-# deploy-back-m05
