@@ -10,7 +10,7 @@ const chargesPaid = async (req, res) => {
             .first();
 
         if (Number(totalAmountBillsPaid.total_amount_bills_paid) === 0 || !totalAmountBillsPaid.total_amount_bills_paid) {
-            return res.status(400).json(0);
+            return res.status(200).json(0);
         }
 
         return res.status(200).json(totalAmountBillsPaid);
@@ -30,7 +30,7 @@ const overdueCharges = async (req, res) => {
             .first();
 
         if (Number(totalAmountOverdueCharges.total_amount_overdue_charges) === 0 || !totalAmountOverdueCharges.total_amount_overdue_charges) {
-            return res.status(400).json(0);
+            return res.status(200).json(0);
         }
 
         return res.status(200).json(totalAmountOverdueCharges);
@@ -48,7 +48,7 @@ const anticipatedCharges = async (req, res) => {
             .first();
 
         if (Number(totalAmountExpectedAccounts.total_amount_expected_accounts) === 0 || !totalAmountExpectedAccounts.total_amount_expected_accounts) {
-            return res.status(400).json(0);
+            return res.status(200).json(0);
         }
 
         return res.status(200).json(totalAmountExpectedAccounts);
@@ -67,7 +67,7 @@ const highlightsOverdueCollections = async (req, res) => {
             .limit(4);
 
         if (!expiredHighlight || expiredHighlight.length === 0) {
-            return res.status(400).json(0);
+            return res.status(200).json(0);
         }
 
         return res.status(200).json(expiredHighlight);
@@ -86,7 +86,7 @@ const highlightsExpectedCharges = async (req, res) => {
             .limit(4);
 
         if (!predictedHighlight || predictedHighlight.length === 0) {
-            return res.status(400).json(0);
+            return res.status(200).json(0);
         }
 
         return res.status(200).json(predictedHighlight);
@@ -104,7 +104,7 @@ const highlightsPaidCharges = async (req, res) => {
             .limit(4);
 
         if (!paidHighlights || paidHighlights.length === 0) {
-            return res.status(400).json(0);
+            return res.status(200).json(0);
         }
 
         return res.status(200).json(paidHighlights);
