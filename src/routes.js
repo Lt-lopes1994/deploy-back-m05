@@ -20,6 +20,7 @@ const {
   highlightsExpectedCharges,
   highlightsPaidCharges,
   billingRegister,
+  billingList,
 } = require("./controllers/charges");
 
 const checkLogin = require("./middlewares/tokenNeeded");
@@ -51,5 +52,6 @@ routes.get("/delinquentCustomerHighligths", delinquentCustomerHighligths);
 routes.get("/highlightsCustomersUpToDate", highlightsCustomersUpToDate);
 
 routes.post("/billingRegister/:client_id", billingRegister);
+routes.get("/billingList", billingList);
 
 module.exports = routes;

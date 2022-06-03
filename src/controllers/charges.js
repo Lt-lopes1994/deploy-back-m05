@@ -20,14 +20,14 @@ const chargesPaid = async (req, res) => {
     }
 }
 
-const currentMoment = format(new Date(), 'yyyy.MM.dd');
+const currentMoment = () => new Date();
 
 const overdueCharges = async (req, res) => {
     try {
         const totalAmountOverdueCharges = await knex('charges')
             .select(knex.raw(`sum(value) as total_amount_overdue_charges`))
             .where('paid', '=', false)
-            .where('due_date', '<', currentMoment)
+            .where('due_date', '<', currentMoment())
             .first();
 
         if (Number(totalAmountOverdueCharges.total_amount_overdue_charges) === 0 || !totalAmountOverdueCharges.total_amount_overdue_charges) {
@@ -45,7 +45,7 @@ const anticipatedCharges = async (req, res) => {
         const totalAmountExpectedAccounts = await knex('charges')
             .select(knex.raw(`sum(value) as total_amount_expected_accounts`))
             .where('paid', '=', false)
-            .where('due_date', '>', currentMoment)
+            .where('due_date', '>', currentMoment())
             .first();
 
         if (Number(totalAmountExpectedAccounts.total_amount_expected_accounts) === 0 || !totalAmountExpectedAccounts.total_amount_expected_accounts) {
@@ -64,7 +64,7 @@ const highlightsOverdueCollections = async (req, res) => {
             .from('charges')
             .leftJoin('clients', 'clients.id', 'charges.user_id')
             .where('paid', '=', false)
-            .where('due_date', '<', currentMoment)
+            .where('due_date', '<', currentMoment())
             .limit(4);
 
         if (!expiredHighlight || expiredHighlight.length === 0) {
@@ -83,7 +83,7 @@ const highlightsExpectedCharges = async (req, res) => {
             .from('charges')
             .leftJoin('clients', 'clients.id', 'charges.user_id')
             .where('paid', '=', false)
-            .where('due_date', '>', currentMoment)
+            .where('due_date', '>', currentMoment())
             .limit(4);
 
         if (!predictedHighlight || predictedHighlight.length === 0) {
@@ -118,6 +118,10 @@ const billingRegister = async (req, res) => {
     const { client_id } = req.params;
     const { user_id, description, due_date, value, status } = req.body;
 
+    if (!client_id) {
+        return res.status(400).json({ 'error': 'informe o client_id no params' });
+    }
+
     try {
         const clientExist = await knex('client')
             .where({ id: client_id })
@@ -151,6 +155,48 @@ const billingRegister = async (req, res) => {
     }
 }
 
+const billingList = async (req, res) => {
+    const { offset } = req.query;
+
+    const off = offset ? offset : 0;
+
+    try {
+        const charges = await knex
+            .select('client.name', 'charges.id as id_charge', 'value', 'due_date', 'description', 'paid')
+            .from('charges')
+            .leftJoin('client', 'client.id', 'charges.client_id')
+            .limit(9)
+            .offset(off);
+
+        if (!charges) {
+            return res.status(200).json([]);
+        }
+
+        const listCharges = charges.map(charge => {
+
+            if (charge.paid === false && charge.due_date < currentMoment()) {
+                charge.status = "Vencida"
+            }
+            if (charge.paid === false && charge.due_date > currentMoment()) {
+                charge.status = "Pendente"
+            }
+            if (charge.paid === true) {
+                charge.status = "Paga"
+            }
+
+            charge.due_date = format(charge.due_date, 'yyyy-MM-dd');
+            delete charge.paid;
+
+            return charge;
+        }
+        )
+
+        return res.status(200).json({ 'data': listCharges })
+    } catch (error) {
+        return res.status(400).json({ 'message': error.message })
+    }
+}
+
 module.exports = {
     chargesPaid,
     overdueCharges,
@@ -158,5 +204,6 @@ module.exports = {
     highlightsOverdueCollections,
     highlightsExpectedCharges,
     highlightsPaidCharges,
-    billingRegister
+    billingRegister,
+    billingList
 }

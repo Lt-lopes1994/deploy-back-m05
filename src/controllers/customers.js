@@ -1,7 +1,5 @@
 const knex = require('../scripts/conection');
 const loginSchema = require('../validations/loginSchema')
-const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
 const { format } = require('date-fns');
 const registerCustomerSchema = require('../validations/registerCustomerSchema');
 const { errors } = require('../scripts/error-messages');
@@ -39,26 +37,29 @@ const registerCustomer = async (req, res) => {
     }
 }
 
-const currentMoment = format(new Date(), 'dd.MM.yyyy');
+const currentMoment = () => new Date();
 
 const delinquentCustomerHighligths = async (req, res) => {
     try {
-        const sampleDelinquentCustomers = await knex('cobrancas')
-            .leftJoin('clientes', 'nome', 'data_vencimento', 'valor')
-            .where({ pago: false })
-            .andWhere('data_vencimento', '<', currentMoment)
-            .limit(4)
-            .orderBy(desc);
+        const sampleDelinquentCustomers = await knex.select('client.name', 'due_date', 'value', 'client.id')
+            .from('charges')
+            .leftJoin('client', 'client.id', 'charges.client_id')
+            .where('paid', '=', false)
+            .where('due_date', '<', currentMoment())
+            .distinctOn('client.id')
+            .limit(4);
 
-        if (!sampleDelinquentCustomers) {
-            return res.status(400).json(errors.noReturnFromDefaultingCustomers);
+        if (!sampleDelinquentCustomers || sampleDelinquentCustomers.length === 0) {
+            return res.status(200).json([]);
         }
 
-        if (sampleDelinquentCustomers.length == 0) {
-            return res.status(404).json(errors.noDelinquentCustomers);
+        const dueDateFormat = sampleDelinquentCustomers.map(delinquent => {
+            delinquent.due_date = format(delinquent.due_date, 'yyyy-MM-dd');
+            return delinquent;
         }
+        )
 
-        return res.status(200).json(sampleDelinquentCustomers);
+        return res.status(200).json({ 'data': dueDateFormat });
     } catch (error) {
         return res.status(400).json({ 'message': error.message });
     }
@@ -66,21 +67,25 @@ const delinquentCustomerHighligths = async (req, res) => {
 
 const highlightsCustomersUpToDate = async (req, res) => {
     try {
-        const sampleRegularizedCustomers = await knex('cobrancas')
-            .leftJoin('clientes', 'nome', 'data_vencimento', 'valor')
-            .where({ pago: true })
-            .limit(4)
-            .orderBy(desc);
+        const sampleRegularizedCustomers = await knex.select('client.name', 'due_date', 'value', 'client.id')
+            .from('charges')
+            .leftJoin('client', 'client.id', 'charges.client_id')
+            .where('paid', '=', 'true')
+            .orWhere('due_date', '>', currentMoment())
+            .distinctOn('client.id')
+            .limit(4);
 
-        if (!sampleRegularizedCustomers) {
-            return res.status(400).json(errors.noReturnFromRegularizedCustomers);
+        if (!sampleRegularizedCustomers || sampleRegularizedCustomers.length === 0) {
+            return res.status(200).json([]);
         }
 
-        if (sampleRegularizedCustomers.length == 0) {
-            return res.status(404).json(errors.noRegularizedCustomers);
+        const dueDateFormat = sampleRegularizedCustomers.map(delinquent => {
+            delinquent.due_date = format(delinquent.due_date, 'yyyy-MM-dd');
+            return delinquent;
         }
+        )
 
-        return res.status(200).json(sampleRegularizedCustomers);
+        return res.status(200).json({ 'data': dueDateFormat });
     } catch (error) {
         return res.status(400).json({ 'message': error.message });
     }
