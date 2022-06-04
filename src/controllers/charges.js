@@ -17,7 +17,7 @@ const chargesPaid = async (req, res) => {
       return res.status(200).json(0);
     }
 
-    return res.status(200).json(totalAmountBillsPaid.totalAmountBillsPaid);
+    return res.status(200).json(totalAmountBillsPaid);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
