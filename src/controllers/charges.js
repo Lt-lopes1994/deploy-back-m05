@@ -125,8 +125,10 @@ const highlightsPaidCharges = async (req, res) => {
       {
         highlight.name,
           highlight.id_charge,
-          (highlight.value / 100).toFixed(2).replace(".", ","),
-          highlight.client_id;
+          highlight.client_id,
+          (highlight.value = (highlight.value / 100)
+            .toFixed(2)
+            .replace(".", ","));
       }
     });
 
