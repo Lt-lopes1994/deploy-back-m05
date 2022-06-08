@@ -82,7 +82,7 @@ const highlightsOverdueCollections = async (req, res) => {
       return res.status(200).json([]);
     }
 
-    const expiredHighlightFormatted = expiredHighlight.map((highlight) => {
+    expiredHighlight.map((highlight) => {
       {
         highlight.name,
           highlight.id_charge,
