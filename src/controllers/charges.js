@@ -132,7 +132,7 @@ const highlightsPaidCharges = async (req, res) => {
       }
     });
 
-    return res.status(200).json(paidHighlightsFormatted);
+    return res.status(200).json(paidHighlights);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
