@@ -122,11 +122,15 @@ const highlightsPaidCharges = async (req, res) => {
     }
 
     const paidHighlightsFormatted = paidHighlights.map((highlight) => {
-      highlight.name,
-        highlight.id_charge,
-        (highlight.value / 100).toFixed(2).replace(".", ",");
-      highlight.client_id;
+      {
+        highlight.name,
+          highlight.id_charge,
+          (highlight.value / 100).toFixed(2).replace(".", ","),
+          highlight.client_id;
+      }
     });
+
+    console.log(paidHighlightsFormatted);
 
     return res.status(200).json(paidHighlightsFormatted);
   } catch (error) {
