@@ -82,6 +82,17 @@ const highlightsOverdueCollections = async (req, res) => {
       return res.status(200).json([]);
     }
 
+    const expiredHighlightFormatted = expiredHighlight.map((highlight) => {
+      {
+        highlight.name,
+          highlight.id_charge,
+          highlight.client_id,
+          (highlight.value = (highlight.value / 100)
+            .toFixed(2)
+            .replace(".", ","));
+      }
+    });
+
     return res.status(200).json(expiredHighlight);
   } catch (error) {
     return res.status(400).json({ message: error.message });
