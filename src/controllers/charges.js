@@ -128,7 +128,7 @@ const highlightsPaidCharges = async (req, res) => {
       highlight.client_id;
     });
 
-    return res.status(200).json(paidHighlights);
+    return res.status(200).json(paidHighlightsFormatted);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
