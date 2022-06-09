@@ -116,7 +116,13 @@ HTTP Status 400
 
 // POST/login
 {   
- "message": "login realizado com sucesso"
+ "user": {
+		"id": 14,
+		"name": "João Silva",
+		"email": "silva.joaoe@email.email"
+	},
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImlhdCI6MTY1NDU1MDE0NywiZXhwIjoxNjU0NTU3MzQ3fQ.fg2A9QzDf-uziNtKUHvVvuudYsDZyXo5IqQV-VXDmNE",
+  "message": "login realizado com sucesso"
 }
 
 HTTP Status 200
