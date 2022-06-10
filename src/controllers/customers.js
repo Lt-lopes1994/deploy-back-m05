@@ -21,19 +21,19 @@ const registerCustomer = async (req, res) => {
   try {
     await registerCustomerSchema.validate(req.body);
 
-    const registeredEmail = await knex("users").where({ email }).first();
+    const registeredEmail = await knex("clients").where({ email }).first();
 
     if (registeredEmail) {
       return res.status(400).json(errors.userExists);
     }
 
-    const registeredCPF = await knex("users").where({ cpf }).first();
+    const registeredCPF = await knex("clients").where({ cpf }).first();
 
     if (registeredCPF) {
       return res.status(400).json(errors.cpfExists);
     }
 
-    const customer = await knex("users").insert({
+    const customer = await knex("clients").insert({
       name,
       email,
       cpf,
