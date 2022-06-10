@@ -287,12 +287,10 @@ const customerUpdate = async (req, res) => {
     !city &&
     !uf
   ) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "é necessário informar ao menos um campo para fazer a atualização do cliente",
-      });
+    return res.status(400).json({
+      error:
+        "é necessário informar ao menos um campo para fazer a atualização do cliente",
+    });
   }
 
   try {

@@ -83,6 +83,17 @@ const highlightsOverdueCollections = async (req, res) => {
       return res.status(200).json([]);
     }
 
+    expiredHighlight.map((highlight) => {
+      {
+        highlight.name,
+          highlight.id_charge,
+          highlight.client_id,
+          (highlight.value = (highlight.value / 100)
+            .toFixed(2)
+            .replace(".", ","));
+      }
+    });
+
     return res.status(200).json(expiredHighlight);
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -99,7 +110,7 @@ const allOverdueCharges = async (req, res) => {
       .where("due_date", "<", currentMoment());
 
     if (!expiredHighlight || expiredHighlight.length === 0) {
-      return res.status(400).json(errors.noReturnOverdueCharges);
+      return res.status(200).json([]);
     }
 
     return res.status(200).json(expiredHighlight);
@@ -122,6 +133,17 @@ const highlightsExpectedCharges = async (req, res) => {
       return res.status(200).json([]);
     }
 
+    predictedHighlight.map((highlight) => {
+      {
+        highlight.name,
+          highlight.id_charge,
+          highlight.client_id,
+          (highlight.value = (highlight.value / 100)
+            .toFixed(2)
+            .replace(".", ","));
+      }
+    });
+
     return res.status(200).json(predictedHighlight);
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -138,7 +160,7 @@ const allAnticipatedCharges = async (req, res) => {
       .where("due_date", "<", currentMoment());
 
     if (!predictedHighlight || predictedHighlight.length === 0) {
-      return res.status(400).json(errors.noReturnAnticipatedCharges);
+      return res.status(200).json([]);
     }
 
     return res.status(200).json(predictedHighlight);
@@ -160,6 +182,17 @@ const highlightsPaidCharges = async (req, res) => {
       return res.status(200).json([]);
     }
 
+    paidHighlights.map((highlight) => {
+      {
+        highlight.name,
+          highlight.id_charge,
+          highlight.client_id,
+          (highlight.value = (highlight.value / 100)
+            .toFixed(2)
+            .replace(".", ","));
+      }
+    });
+
     return res.status(200).json(paidHighlights);
   } catch (error) {
     return res.status(400).json({ message: error.message });
@@ -175,7 +208,7 @@ const allChargesPaid = async (req, res) => {
       .where("paid", "=", true);
 
     if (!paidHighlights || paidHighlights.length === 0) {
-      return res.status(400).json(errors.noReturnBillsPaid);
+      return res.status(200).json([]);
     }
 
     return res.status(200).json(paidHighlights);
