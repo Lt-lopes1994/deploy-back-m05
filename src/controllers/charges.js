@@ -241,7 +241,14 @@ const billingRegister = async (req, res) => {
     }
 
     const newCharge = await knex("charges")
-      .insert({ user_id, client_id, value, paid: status, due_date })
+      .insert({
+        user_id,
+        client_id,
+        value,
+        paid: status,
+        due_date,
+        description,
+      })
       .returning("*");
 
     if (!newCharge) {
