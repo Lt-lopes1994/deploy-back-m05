@@ -153,11 +153,11 @@ const highlightsExpectedCharges = async (req, res) => {
 const allAnticipatedCharges = async (req, res) => {
   try {
     const predictedHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value")
+      .select("clients.name", "charges.id as id_charge", "value", "client_id")
       .from("charges")
-      .leftJoin("clients", "clients.id", "charges.client_id")
+      .leftJoin("clients", "clients.id", "charges.user_id")
       .where("paid", "=", false)
-      .where("due_date", "<", currentMoment());
+      .where("due_date", ">", currentMoment());
 
     if (!predictedHighlight || predictedHighlight.length === 0) {
       return res.status(200).json([]);
@@ -165,7 +165,7 @@ const allAnticipatedCharges = async (req, res) => {
 
     return res.status(200).json(predictedHighlight);
   } catch (error) {
-    return res.status(400).json({ mensagem: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
