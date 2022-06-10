@@ -11,14 +11,13 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS clients (
-  	id serial primary key,
+  id serial primary key,
 	user_id serial references users(id),
-  	name text not null,
-  	email varchar(80) not null unique,
-  	password text not null,
-	cpf varchar(11) not null unique,
+  name text not null,
+  email varchar(80) not null unique,
+  cpf varchar(11) not null unique,
 	phone varchar(11),
-	adrress text,
+	adress text,
 	cep varchar(8),
 	complement text,
 	district text,

@@ -18,6 +18,8 @@ const registerCustomer = async (req, res) => {
     uf,
   } = req.body;
 
+  const user = 1;
+
   try {
     await registerCustomerSchema.validate(req.body);
 
@@ -44,6 +46,7 @@ const registerCustomer = async (req, res) => {
       district,
       city,
       uf,
+      user_id: user,
     });
 
     if (!customer) {
