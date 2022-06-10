@@ -33,5 +33,6 @@ CREATE TABLE IF NOT EXISTS charges (
 	client_id serial not null references clients(id),
   	value integer not null,
 	paid boolean default false,
-	due_date date not null
+	due_date date not null,
+	DESCRIPTION text NOT NULL
 );
