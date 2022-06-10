@@ -32,14 +32,14 @@ const {
   billingDetails,
 } = require("./controllers/charges");
 
-// const checkLogin = require("./middlewares/tokenNeeded");
+const checkLogin = require("./middlewares/checkLogin");
 
 const routes = express();
 
 routes.post("/signup", registerUser);
 routes.post("/login", login);
 
-// routes.use(checkLogin);
+routes.use(checkLogin);
 
 routes.patch("/updateUser", updateUser);
 routes.get("/informationToTheUserHimself", informationToTheUserHimself);
