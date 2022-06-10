@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS clients (
   id serial primary key,
-	user_id serial references users(id),
   name text not null,
   email varchar(80) not null unique,
   cpf varchar(11) not null unique,
@@ -22,9 +21,8 @@ CREATE TABLE IF NOT EXISTS clients (
 	complement text,
 	district text,
 	city text not null,
-	uf varchar(2) not null,
-	defaulter boolean default false
-);
+	uf varchar(2) not null
+	);
 
 CREATE TABLE IF NOT EXISTS charges (
 	id serial primary key,    

@@ -18,8 +18,6 @@ const registerCustomer = async (req, res) => {
     uf,
   } = req.body;
 
-  const user = 1;
-
   try {
     await registerCustomerSchema.validate(req.body);
 
@@ -35,19 +33,7 @@ const registerCustomer = async (req, res) => {
       return res.status(400).json(errors.cpfExists);
     }
 
-    const customer = await knex("clients").insert({
-      name,
-      email,
-      cpf,
-      phone,
-      adress,
-      cep,
-      complement,
-      district,
-      city,
-      uf,
-      user_id: user,
-    });
+    const customer = await knex("clients").insert(req.body);
 
     if (!customer) {
       return res.status(400).json(errors.unregisteredCustomer);
