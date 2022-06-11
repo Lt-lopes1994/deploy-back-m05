@@ -100,60 +100,41 @@ const allDelinquentCustomers = async (req, res) => {
 
 const highlightsCustomersUpToDate = async (req, res) => {
   try {
-    const sampleRegularizedCustomers = await knex
-      .select("clients.name", "due_date", "value", "clients.id")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.client_id")
-      .where("paid", "=", "true")
-      .orWhere("due_date", ">", currentMoment())
-      .distinctOn("clients.id")
-      .limit(4);
+    const allCustomers = await knex("clients")
+      .select("name", "cpf", "email", "phone", "clients.id")
+      .orderBy("clients.id");
 
-    if (
-      !sampleRegularizedCustomers ||
-      sampleRegularizedCustomers.length === 0
-    ) {
+    if (!allCustomers || allCustomers.length === 0) {
       return res.status(200).json([]);
     }
 
-    const dueDateFormat = sampleRegularizedCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, "yyyy-MM-dd");
-      return delinquent;
-    });
+    const filterCustomers = [];
 
-    return res.status(200).json({ data: dueDateFormat });
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
-  }
-};
+    for (let customer of allCustomers) {
+      const chargesCustomer = await knex("charges").where({
+        client_id: customer.id,
+      });
 
-const allCustomersUpToDate = async (req, res) => {
-  try {
-    const sampleRegularizedCustomers = await knex
-      .select("clients.name", "due_date", "value", "clients.id")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.client_id")
-      .where("paid", "=", "true")
-      .orWhere("due_date", ">", currentMoment())
-      .distinctOn("clients.id");
+      customer.charges = [];
+      for (let charge of chargesCustomer) {
+        if (!charge.paid && charge.due_date < currentMoment()) {
+          break;
+        }
+        if (!charge.paid && charge.due_date > currentMoment() || charge.paid) {
+          customer.charges.push(charge);
+        }
+      }
 
-    if (
-      !sampleRegularizedCustomers ||
-      sampleRegularizedCustomers.length === 0
-    ) {
-      return res.status(200).json([]);
+      if (customer.charges.length !== 0) {
+        filterCustomers.push(customer);
+      }
     }
 
-    const dueDateFormat = sampleRegularizedCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, "yyyy-MM-dd");
-      return delinquent;
-    });
-
-    return res.status(200).json({ data: dueDateFormat });
+    return res.status(200).json({ data: filterCustomers });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
-};
+}
 
 const customers = async (req, res) => {
   const { offset } = req.query;
@@ -324,7 +305,6 @@ module.exports = {
   delinquentCustomerHighligths,
   allDelinquentCustomers,
   highlightsCustomersUpToDate,
-  allCustomersUpToDate,
   customers,
   customerDetail,
   customerUpdate,
