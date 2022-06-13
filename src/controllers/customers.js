@@ -121,8 +121,9 @@ const highlightsCustomersUpToDate = async (req, res) => {
           break;
         }
         if (!charge.paid && charge.due_date > currentMoment() || charge.paid) {
-          customer.charges.push(charge);
-          return;
+          if (customer.charges.length <= 1) {
+            customer.charges.push(charge);
+          }
         }
       }
 
@@ -166,10 +167,11 @@ const allCustomersUpToDate = async (req, res) => {
         (charge) => !charge.paid && charge.due_date < currentMoment()
       );
 
-      if (!checkOverdueCharge) {
-        customer.status = "Em dia";
-        customersData.push(customer);
+      if (checkOverdueCharge) {
+        return;
       }
+      customer.status = "Em dia";
+      customersData.push(customer);
     }
 
     return res.status(200).json({ data: customersData });
