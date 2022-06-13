@@ -151,6 +151,8 @@ const allCustomersUpToDate = async (req, res) => {
       .offset(p)
       .orderBy("id");
 
+    console.log(allCustomers);
+
     if (!allCustomers || allCustomers.length === 0) {
       return res.status(200).json([]);
     }
