@@ -140,6 +140,44 @@ const highlightsCustomersUpToDate = async (req, res) => {
   }
 }
 
+const allCustomersUpToDate = async (req, res) => {
+  const { offset } = req.query;
+
+  const p = offset ? offset : 0;
+
+  try {
+    const allCustomers = await knex("clients")
+      .select("name", "cpf", "email", "phone", "id")
+      .offset(p)
+      .orderBy("id");
+
+    if (!allCustomers || allCustomers.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const customersData = [];
+
+    for (let customer of allCustomers) {
+      const chargesCustomer = await knex("charges").where({
+        client_id: customer.id,
+      });
+
+      const checkOverdueCharge = chargesCustomer.find(
+        (charge) => !charge.paid && charge.due_date < currentMoment()
+      );
+
+      if (!checkOverdueCharge) {
+        customer.status = "Em dia";
+        customersData.push(customer);
+      }
+    }
+
+    return res.status(200).json({ data: customersData });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
 const customers = async (req, res) => {
   const { offset } = req.query;
 
@@ -309,6 +347,7 @@ module.exports = {
   delinquentCustomerHighligths,
   allDelinquentCustomers,
   highlightsCustomersUpToDate,
+  allCustomersUpToDate,
   customers,
   customerDetail,
   customerUpdate,

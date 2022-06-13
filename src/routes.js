@@ -10,6 +10,7 @@ const {
   delinquentCustomerHighligths,
   allDelinquentCustomers,
   highlightsCustomersUpToDate,
+  allCustomersUpToDate,
   customers,
   customerDetail,
   customerUpdate,
@@ -62,6 +63,7 @@ routes.post("/registerCustomer", registerCustomer);
 routes.get("/delinquentCustomerHighligths", delinquentCustomerHighligths);
 routes.get("/allDelinquentCustomers", allDelinquentCustomers);
 routes.get("/highlightsCustomersUpToDate", highlightsCustomersUpToDate);
+routes.get("/allCustomersUpToDate", allCustomersUpToDate);
 routes.get("/customers", customers);
 routes.get("/customerDetail/:id_customer", customerDetail);
 routes.patch("/customerUpdate/:id_customer", customerUpdate);
