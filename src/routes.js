@@ -35,14 +35,17 @@ const checkLogin = require("./middlewares/checkLogin");
 
 const routes = express();
 
+//? Rotas para login
 routes.post("/signup", registerUser);
 routes.post("/login", login);
 
-routes.use(checkLogin);
+// routes.use(checkLogin);
 
+//? Rotas para informação de usuário
 routes.patch("/updateUser", updateUser);
 routes.get("/informationToTheUserHimself", informationToTheUserHimself);
 
+//? Rotas para Contas.
 routes.get("/chargesPaid", chargesPaid);
 routes.get("/overdueCharges", overdueCharges);
 routes.get("/anticipatedCharges", anticipatedCharges);
@@ -54,6 +57,7 @@ routes.get("/allAnticipatedCharges", allAnticipatedCharges);
 routes.get("/highlightsPaidCharges", highlightsPaidCharges);
 routes.get("/allChargesPaid", allChargesPaid);
 
+//? Rotas para Clientes.
 routes.post("/registerCustomer", registerCustomer);
 routes.get("/delinquentCustomerHighligths", delinquentCustomerHighligths);
 routes.get("/allDelinquentCustomers", allDelinquentCustomers);
