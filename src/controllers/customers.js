@@ -121,17 +121,16 @@ const highlightsCustomersUpToDate = async (req, res) => {
           break;
         }
         if (!charge.paid && charge.due_date > currentMoment() || charge.paid) {
-          if (customer.charges.length <= 1) {
+          if (customer.charges.length < 1) {
             customer.charges.push(charge);
           }
         }
       }
 
       if (customer.charges.length !== 0) {
-        if (filterCustomers.length <= 4) {
+        if (filterCustomers.length < 4) {
           filterCustomers.push(customer);
         }
-        return;
       }
     }
 
