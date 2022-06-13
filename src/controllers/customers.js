@@ -129,8 +129,8 @@ const highlightsCustomersUpToDate = async (req, res) => {
       if (customer.charges.length !== 0) {
         if (filterCustomers.length <= 4) {
           filterCustomers.push(customer);
-          return;
         }
+        return;
       }
     }
 
