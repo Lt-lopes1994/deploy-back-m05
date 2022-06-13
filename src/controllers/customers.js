@@ -166,11 +166,10 @@ const allCustomersUpToDate = async (req, res) => {
         (charge) => !charge.paid && charge.due_date < currentMoment()
       );
 
-      if (checkOverdueCharge) {
-        return;
+      if (!checkOverdueCharge) {
+        customer.status = "Em dia";
+        customersData.push(customer);
       }
-      customer.status = "Em dia";
-      customersData.push(customer);
     }
 
     return res.status(200).json({ data: customersData });
