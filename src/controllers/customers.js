@@ -1,8 +1,9 @@
-const knex = require("../scripts/conection");
-const { format } = require("date-fns");
-const registerCustomerSchema = require("../validations/registerCustomerSchema");
-const customerUpdateSchema = require("../validations/customerUpdateSchema");
-const { errors } = require("../scripts/error-messages");
+const knex = require('../scripts/conection');
+const { format } = require('date-fns');
+const registerCustomerSchema = require('../validations/registerCustomerSchema');
+const customerUpdateSchema = require('../validations/customerUpdateSchema');
+const errors = require('../scripts/error-messages');
+const messages = require('../scripts/messages');
 
 const registerCustomer = async (req, res) => {
   const {
@@ -10,7 +11,7 @@ const registerCustomer = async (req, res) => {
     email,
     cpf,
     phone,
-    adress,
+    address,
     cep,
     complement,
     district,
@@ -21,27 +22,27 @@ const registerCustomer = async (req, res) => {
   try {
     await registerCustomerSchema.validate(req.body);
 
-    const registeredEmail = await knex("clients").where({ email }).first();
+    const registeredEmail = await knex('clients').where({ email }).first();
 
     if (registeredEmail) {
       return res.status(400).json(errors.userExists);
     }
 
-    const registeredCPF = await knex("clients").where({ cpf }).first();
+    const registeredCPF = await knex('clients').where({ cpf }).first();
 
     if (registeredCPF) {
       return res.status(400).json(errors.cpfExists);
     }
 
-    const customer = await knex("clients").insert(req.body);
+    const customer = await knex('clients').insert(req.body);
 
     if (!customer) {
       return res.status(400).json(errors.unregisteredCustomer);
     }
 
-    return res.status(200).json({ message: "Cliente cadastrado com sucesso" });
+    return res.status(200).json({ 'message': messages.clientRegisteredSuccessfully });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -50,12 +51,12 @@ const currentMoment = () => new Date();
 const delinquentCustomerHighligths = async (req, res) => {
   try {
     const sampleDelinquentCustomers = await knex
-      .select("clients.name", "due_date", "value", "clients.id")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.client_id")
-      .where("paid", "=", false)
-      .where("due_date", "<", currentMoment())
-      .distinctOn("clients.id")
+      .select('clients.name', 'due_date', 'value', 'clients.id')
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.client_id')
+      .where('paid', '=', false)
+      .where('due_date', '<', currentMoment())
+      .distinctOn('clients.id')
       .limit(4);
 
     if (!sampleDelinquentCustomers || sampleDelinquentCustomers.length === 0) {
@@ -63,46 +64,46 @@ const delinquentCustomerHighligths = async (req, res) => {
     }
 
     const dueDateFormat = sampleDelinquentCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, "yyyy-MM-dd");
+      delinquent.due_date = format(delinquent.due_date, 'yyyy-MM-dd');
       return delinquent;
     });
 
-    return res.status(200).json({ data: dueDateFormat });
+    return res.status(200).json({ 'data': dueDateFormat });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
 const allDelinquentCustomers = async (req, res) => {
   try {
     const sampleDelinquentCustomers = await knex
-      .select("clients.name", "due_date", "value", "clients.id")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.client_id")
-      .where("paid", "=", false)
-      .where("due_date", "<", currentMoment())
-      .distinctOn("clients.id");
+      .select('clients.name', 'due_date', 'value', 'clients.id')
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.client_id')
+      .where('paid', '=', false)
+      .where('due_date', '<', currentMoment())
+      .distinctOn('clients.id');
 
     if (!sampleDelinquentCustomers || sampleDelinquentCustomers.length === 0) {
       return res.status(400).json([]);
     }
 
     const dueDateFormat = sampleDelinquentCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, "yyyy-MM-dd");
+      delinquent.due_date = format(delinquent.due_date, 'yyyy-MM-dd');
       return delinquent;
     });
 
-    return res.status(200).json({ data: dueDateFormat });
+    return res.status(200).json({ 'data': dueDateFormat });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
 const highlightsCustomersUpToDate = async (req, res) => {
   try {
-    const allCustomers = await knex("clients")
-      .select("name", "cpf", "email", "phone", "clients.id")
-      .orderBy("clients.id");
+    const allCustomers = await knex('clients')
+      .select('name', 'cpf', 'email', 'phone', 'clients.id')
+      .orderBy('clients.id');
 
     if (!allCustomers || allCustomers.length === 0) {
       return res.status(200).json([]);
@@ -111,7 +112,7 @@ const highlightsCustomersUpToDate = async (req, res) => {
     const filterCustomers = [];
 
     for (let customer of allCustomers) {
-      const chargesCustomer = await knex("charges").where({
+      const chargesCustomer = await knex('charges').where({
         client_id: customer.id,
       });
 
@@ -134,7 +135,7 @@ const highlightsCustomersUpToDate = async (req, res) => {
       }
     }
 
-    return res.status(200).json({ data: filterCustomers });
+    return res.status(200).json({ 'data': filterCustomers });
   } catch (error) {
     return res.status(400).json({ 'message': error.message });
   }
@@ -146,10 +147,10 @@ const allCustomersUpToDate = async (req, res) => {
   const p = offset ? offset : 0;
 
   try {
-    const allCustomers = await knex("clients")
-      .select("name", "cpf", "email", "phone", "id")
+    const allCustomers = await knex('clients')
+      .select('name', 'cpf', 'email', 'phone', 'id')
       .offset(p)
-      .orderBy("id");
+      .orderBy('id');
 
     console.log(allCustomers);
 
@@ -160,7 +161,7 @@ const allCustomersUpToDate = async (req, res) => {
     const customersData = [];
 
     for (let customer of allCustomers) {
-      const chargesCustomer = await knex("charges").where({
+      const chargesCustomer = await knex('charges').where({
         client_id: customer.id,
       });
 
@@ -169,14 +170,14 @@ const allCustomersUpToDate = async (req, res) => {
       );
 
       if (!checkOverdueCharge) {
-        customer.status = "Em dia";
+        customer.status = 'Em dia';
         customersData.push(customer);
       }
     }
 
-    return res.status(200).json({ data: customersData });
+    return res.status(200).json({ 'data': customersData });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -186,11 +187,11 @@ const customers = async (req, res) => {
   const p = offset ? offset : 0;
 
   try {
-    const allCustomers = await knex("clients")
-      .select("name", "cpf", "email", "phone", "id")
+    const allCustomers = await knex('clients')
+      .select('name', 'cpf', 'email', 'phone', 'id')
       .offset(p)
       .limit(10)
-      .orderBy("id");
+      .orderBy('id');
 
     if (!allCustomers || allCustomers.length === 0) {
       return res.status(200).json([]);
@@ -199,7 +200,7 @@ const customers = async (req, res) => {
     const customersData = [];
 
     for (let customer of allCustomers) {
-      const chargesCustomer = await knex("charges").where({
+      const chargesCustomer = await knex('charges').where({
         client_id: customer.id,
       });
 
@@ -208,17 +209,17 @@ const customers = async (req, res) => {
       );
 
       if (checkOverdueCharge) {
-        customer.status = "Inadimplente";
+        customer.status = 'Inadimplente';
       } else {
-        customer.status = "Em dia";
+        customer.status = 'Em dia';
       }
 
       customersData.push(customer);
     }
 
-    return res.status(200).json({ data: customersData });
+    return res.status(200).json({ 'data': customersData });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -228,28 +229,28 @@ const customerDetail = async (req, res) => {
   try {
     const customer = await knex
       .select(
-        "name",
-        "email",
-        "address",
-        "phone",
-        "district",
-        "cpf",
-        "complement",
-        "cep",
-        "city",
-        "uf"
+        'name',
+        'email',
+        'address',
+        'phone',
+        'district',
+        'cpf',
+        'complement',
+        'cep',
+        'city',
+        'uf'
       )
-      .from("clients")
-      .where("clients.id", "=", id_customer);
+      .from('clients')
+      .where('clients.id', '=', id_customer);
 
     if (!customer || customer.length === 0) {
       return res.status(200).json([]);
     }
 
     const customerCharges = await knex
-      .select("charges.id", "due_date", "value", "paid", "description")
-      .from("charges")
-      .where("charges.client_id", "=", id_customer);
+      .select('charges.id', 'due_date', 'value', 'paid', 'description')
+      .from('charges')
+      .where('charges.client_id', '=', id_customer);
 
     if (!customerCharges || customerCharges.length === 0) {
       return res.status(200).json([]);
@@ -257,16 +258,16 @@ const customerDetail = async (req, res) => {
 
     const checkBillingStatus = customerCharges.map((charge) => {
       if (charge.paid === false && charge.due_date < currentMoment()) {
-        charge.status = "Vencida";
+        charge.status = 'Vencida';
       }
       if (charge.paid === false && charge.due_date > currentMoment()) {
-        charge.status = "Pendente";
+        charge.status = 'Pendente';
       }
       if (charge.paid === true) {
-        charge.status = "Paga";
+        charge.status = 'Paga';
       }
 
-      charge.due_date = format(charge.due_date, "dd-MM-yyyy");
+      charge.due_date = format(charge.due_date, 'dd-MM-yyyy');
       delete charge.paid;
 
       return charge;
@@ -281,7 +282,7 @@ const customerDetail = async (req, res) => {
 
     return res.status(200).json(detailing);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -302,45 +303,45 @@ const customerUpdate = async (req, res) => {
     !uf
   ) {
     return res.status(400).json({
-      error:
-        "é necessário informar ao menos um campo para fazer a atualização do cliente",
+      'error':
+        errors.itIsNecessaryToInformAtLeastOneFieldToUpdateTheClient
     });
   }
 
   try {
     await customerUpdateSchema.validate(req.body);
 
-    const customerExists = await knex("clients")
-      .where("clients.id", "=", id_customer)
+    const customerExists = await knex('clients')
+      .where('clients.id', '=', id_customer)
       .first();
 
     if (!customerExists || customerExists.length === 0) {
-      return res.status(404).json({ error: "cliente não encontrado" });
+      return res.status(404).json({ 'error': errors.thereIsNoSuchCustomer });
     }
 
     if (email) {
-      const checkEmail = await knex("clients").where({ email }).first();
+      const checkEmail = await knex('clients').where({ email }).first();
 
       if (checkEmail) {
-        return res.status(400).json({ error: "email já cadastrado" });
+        return res.status(400).json({ 'error': errors.userExists });
       }
     }
 
-    const clientEdition = await knex("clients")
+    const clientEdition = await knex('clients')
       .update(req.body)
-      .where("clients.id", "=", id_customer);
+      .where('clients.id', '=', id_customer);
 
     if (!clientEdition || clientEdition.length === 0) {
       return res
         .status(400)
-        .json({ error: "não foi possível atualizar o cliente" });
+        .json({ 'error': errors.unableToUpdateClient });
     }
 
     return res
       .status(200)
-      .json({ message: "atualização do cliente concluída com sucesso" });
+      .json({ 'message': messages.clientUpdateCompletedSuccessfully });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 

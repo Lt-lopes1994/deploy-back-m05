@@ -1,14 +1,15 @@
-const knex = require("../scripts/conection");
-const { format } = require("date-fns");
-const { errors } = require("../scripts/error-messages");
-const billingRegisterSchema = require("../validations/billingRegisterSchema");
-const billingEditSchema = require("../validations/billingEditSchema");
+const knex = require('../scripts/conection');
+const { format } = require('date-fns');
+const errors = require('../scripts/error-messages');
+const billingRegisterSchema = require('../validations/billingRegisterSchema');
+const billingEditSchema = require('../validations/billingEditSchema');
+const messages = require('../scripts/messages');
 
 const chargesPaid = async (req, res) => {
   try {
-    const totalAmountBillsPaid = await knex("charges")
+    const totalAmountBillsPaid = await knex('charges')
       .select(knex.raw(`sum(value) as total_amount_bills_paid`))
-      .where("paid", "=", true)
+      .where('paid', '=', true)
       .first();
 
     if (
@@ -28,10 +29,10 @@ const currentMoment = () => new Date();
 
 const overdueCharges = async (req, res) => {
   try {
-    const totalAmountOverdueCharges = await knex("charges")
+    const totalAmountOverdueCharges = await knex('charges')
       .select(knex.raw(`sum(value) as total_amount_overdue_charges`))
-      .where("paid", "=", false)
-      .where("due_date", "<", currentMoment())
+      .where('paid', '=', false)
+      .where('due_date', '<', currentMoment())
       .first();
 
     if (
@@ -49,15 +50,15 @@ const overdueCharges = async (req, res) => {
 
 const anticipatedCharges = async (req, res) => {
   try {
-    const totalAmountExpectedAccounts = await knex("charges")
+    const totalAmountExpectedAccounts = await knex('charges')
       .select(knex.raw(`sum(value) as total_amount_expected_accounts`))
-      .where("paid", "=", false)
-      .where("due_date", ">", currentMoment())
+      .where('paid', '=', false)
+      .where('due_date', '>', currentMoment())
       .first();
 
     if (
       Number(totalAmountExpectedAccounts.total_amount_expected_accounts) ===
-        0 ||
+      0 ||
       !totalAmountExpectedAccounts.total_amount_expected_accounts
     ) {
       return res.status(200).json(0);
@@ -72,11 +73,11 @@ const anticipatedCharges = async (req, res) => {
 const highlightsOverdueCollections = async (req, res) => {
   try {
     const expiredHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "client_id")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.user_id")
-      .where("paid", "=", false)
-      .where("due_date", "<", currentMoment())
+      .select('clients.name', 'charges.id as id_charge', 'value', 'client_id')
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.user_id')
+      .where('paid', '=', false)
+      .where('due_date', '<', currentMoment())
       .limit(4);
 
     if (!expiredHighlight || expiredHighlight.length === 0) {
@@ -90,7 +91,7 @@ const highlightsOverdueCollections = async (req, res) => {
           highlight.client_id,
           (highlight.value = (highlight.value / 100)
             .toFixed(2)
-            .replace(".", ","));
+            .replace('.', ','));
       }
     });
 
@@ -103,11 +104,11 @@ const highlightsOverdueCollections = async (req, res) => {
 const allOverdueCharges = async (req, res) => {
   try {
     const expiredHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "client_id")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.client_id")
-      .where("paid", "=", false)
-      .where("due_date", "<", currentMoment());
+      .select('clients.name', 'charges.id as id_charge', 'value', 'client_id')
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.client_id')
+      .where('paid', '=', false)
+      .where('due_date', '<', currentMoment());
 
     if (!expiredHighlight || expiredHighlight.length === 0) {
       return res.status(200).json([]);
@@ -115,18 +116,18 @@ const allOverdueCharges = async (req, res) => {
 
     return res.status(200).json(expiredHighlight);
   } catch (error) {
-    return res.status(400).json({ mensagem: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
 const highlightsExpectedCharges = async (req, res) => {
   try {
     const predictedHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "client_id")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.user_id")
-      .where("paid", "=", false)
-      .where("due_date", ">", currentMoment())
+      .select('clients.name', 'charges.id as id_charge', 'value', 'client_id')
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.user_id')
+      .where('paid', '=', false)
+      .where('due_date', '>', currentMoment())
       .limit(4);
 
     if (!predictedHighlight || predictedHighlight.length === 0) {
@@ -140,7 +141,7 @@ const highlightsExpectedCharges = async (req, res) => {
           highlight.client_id,
           (highlight.value = (highlight.value / 100)
             .toFixed(2)
-            .replace(".", ","));
+            .replace('.', ','));
       }
     });
 
@@ -153,11 +154,11 @@ const highlightsExpectedCharges = async (req, res) => {
 const allAnticipatedCharges = async (req, res) => {
   try {
     const predictedHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "client_id")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.user_id")
-      .where("paid", "=", false)
-      .where("due_date", ">", currentMoment());
+      .select('clients.name', 'charges.id as id_charge', 'value', 'client_id')
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.user_id')
+      .where('paid', '=', false)
+      .where('due_date', '>', currentMoment());
 
     if (!predictedHighlight || predictedHighlight.length === 0) {
       return res.status(200).json([]);
@@ -172,10 +173,10 @@ const allAnticipatedCharges = async (req, res) => {
 const highlightsPaidCharges = async (req, res) => {
   try {
     const paidHighlights = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "client_id")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.user_id")
-      .where("paid", "=", true)
+      .select('clients.name', 'charges.id as id_charge', 'value', 'client_id')
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.user_id')
+      .where('paid', '=', true)
       .limit(4);
 
     if (!paidHighlights || paidHighlights.length === 0) {
@@ -189,7 +190,7 @@ const highlightsPaidCharges = async (req, res) => {
           highlight.client_id,
           (highlight.value = (highlight.value / 100)
             .toFixed(2)
-            .replace(".", ","));
+            .replace('.', ','));
       }
     });
 
@@ -202,10 +203,10 @@ const highlightsPaidCharges = async (req, res) => {
 const allChargesPaid = async (req, res) => {
   try {
     const paidHighlights = await knex
-      .select("clients.name", "charges.id as id_charge", "value")
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.client_id")
-      .where("paid", "=", true);
+      .select('clients.name', 'charges.id as id_charge', 'value')
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.client_id')
+      .where('paid', '=', true);
 
     if (!paidHighlights || paidHighlights.length === 0) {
       return res.status(200).json([]);
@@ -222,25 +223,25 @@ const billingRegister = async (req, res) => {
   const { user_id, description, due_date, value, status } = req.body;
 
   if (!client_id) {
-    return res.status(400).json({ error: "informe o client_id no params" });
+    return res.status(400).json({ error: errors.enterClientIdParams });
   }
 
   try {
-    const clientExist = await knex("clients").where({ id: client_id }).first();
+    const clientExist = await knex('clients').where({ id: client_id }).first();
 
     if (!clientExist) {
-      return res.status(404).json({ error: "não existe esse cliente" });
+      return res.status(404).json({ error: errors.thereIsNoSuchCustomer });
     }
 
     await billingRegisterSchema.validate(req.body);
 
-    const userExist = await knex("users").where({ id: user_id }).first();
+    const userExist = await knex('users').where({ id: user_id }).first();
 
     if (!userExist) {
-      return res.status(404).json({ error: "não existe esse usuário" });
+      return res.status(404).json({ error: errors.thereIsNoSuchUser });
     }
 
-    const newCharge = await knex("charges")
+    const newCharge = await knex('charges')
       .insert({
         user_id,
         client_id,
@@ -249,15 +250,15 @@ const billingRegister = async (req, res) => {
         due_date,
         description,
       })
-      .returning("*");
+      .returning('*');
 
     if (!newCharge) {
       return res
         .status(400)
-        .json({ error: "não foi possível cadastrar a cobrança" });
+        .json({ error: errors.unableToRegisterTheCharge });
     }
 
-    return res.status(201).json({ message: "cobrança cadastrada com sucesso" });
+    return res.status(201).json({ message: messages.billingSuccessfullyRegistered });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -271,15 +272,15 @@ const billingList = async (req, res) => {
   try {
     const charges = await knex
       .select(
-        "clients.name",
-        "charges.id as id_charge",
-        "value",
-        "due_date",
-        "description",
-        "paid"
+        'clients.name',
+        'charges.id as id_charge',
+        'value',
+        'due_date',
+        'description',
+        'paid'
       )
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.client_id")
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.client_id')
       .limit(9)
       .offset(off);
 
@@ -289,16 +290,16 @@ const billingList = async (req, res) => {
 
     const listCharges = charges.map((charge) => {
       if (charge.paid === false && charge.due_date < currentMoment()) {
-        charge.status = "Vencida";
+        charge.status = 'Vencida';
       }
       if (charge.paid === false && charge.due_date > currentMoment()) {
-        charge.status = "Pendente";
+        charge.status = 'Pendente';
       }
       if (charge.paid === true) {
-        charge.status = "Paga";
+        charge.status = 'Paga';
       }
 
-      charge.due_date = format(charge.due_date, "yyyy-MM-dd");
+      charge.due_date = format(charge.due_date, 'yyyy-MM-dd');
       delete charge.paid;
 
       return charge;
@@ -317,33 +318,33 @@ const billingEdit = async (req, res) => {
   if (!description && !paid && !value && !due_date) {
     return res.status(400).json({
       error:
-        "é necessário informar ao menos um campo para fazer a atualização da cobrança",
+        errors.itIsNecessaryToInformAtLeastOneFieldToUpdateTheBilling,
     });
   }
   try {
     await billingEditSchema.validate(req.body);
 
-    const chargeExists = await knex("charges")
-      .where("charges.id", "=", id_charge)
+    const chargeExists = await knex('charges')
+      .where('charges.id', '=', id_charge)
       .first();
 
     if (!chargeExists || chargeExists.length === 0) {
-      return res.status(404).json({ error: "cobrança não encontrada" });
+      return res.status(404).json({ error: errors.chargeNotFound });
     }
 
-    const chargeUpdate = await knex("charges")
+    const chargeUpdate = await knex('charges')
       .update(req.body)
-      .where("charges.id", "=", id_charge);
+      .where('charges.id', '=', id_charge);
 
     if (!chargeUpdate || chargeUpdate.length === 0) {
       return res
         .status(400)
-        .json({ error: "não foi possível atualizar a cobrança" });
+        .json({ error: errors.unableToUpdateBilling });
     }
 
     return res
       .status(200)
-      .json({ message: "atualização da cobrança concluída com sucesso" });
+      .json({ message: messages.billingUpdateSuccessfullyCompleted });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -356,45 +357,45 @@ const deleteCharge = async (req, res) => {
   if (!id_customer) {
     return res
       .status(400)
-      .json({ error: "é necessário informar o id_customer" });
+      .json({ error: errors.itIsNecessaryToInformTheIdCustomer });
   }
 
   try {
-    const chargeExists = await knex("charges")
-      .where("charges.id", "=", id_charge)
+    const chargeExists = await knex('charges')
+      .where('charges.id', '=', id_charge)
       .first();
 
     if (!chargeExists || chargeExists.length === 0) {
-      return res.status(404).json({ error: "cobrança não encontrada" });
+      return res.status(404).json({ error: errors.chargeNotFound });
     }
 
-    const customerExists = await knex("clients")
-      .where("clients.id", "=", id_customer)
+    const customerExists = await knex('clients')
+      .where('clients.id', '=', id_customer)
       .first();
 
     if (!customerExists || customerExists.length === 0) {
-      return res.status(404).json({ error: "cliente não encontrado" });
+      return res.status(404).json({ error: errors.thereIsNoSuchCustomer });
     }
 
     if (chargeExists.paid || chargeExists.due_date < currentMoment()) {
       return res.status(400).json({
         error:
-          "a cobrança não pode ser deletada ou por estar vencida ou por estar paga",
+          errors.theChargeCannotBeDeletedEitherBecauseItIsOverdueOrPaid
       });
     }
 
-    const deleteAccount = await knex("charges")
-      .where("charges.id", "=", id_charge)
-      .where("charges.client_id", "=", id_customer)
+    const deleteAccount = await knex('charges')
+      .where('charges.id', '=', id_charge)
+      .where('charges.client_id', '=', id_customer)
       .del();
 
     if (!deleteAccount || deleteAccount.length === 0) {
       return res
         .status(400)
-        .json({ error: "a cobrança não pode ser excluída" });
+        .json({ error: errors.theChargeCannotBeDeleted });
     }
 
-    return res.status(200).json({ message: "cobrança excluída com sucesso" });
+    return res.status(200).json({ message: messages.chargeDeletedSuccessfully });
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -406,37 +407,37 @@ const billingDetails = async (req, res) => {
   try {
     const chargeExists = await knex
       .select(
-        "name",
-        "description",
-        "due_date",
-        "value",
-        "charges.id as id_charge",
-        "paid"
+        'name',
+        'description',
+        'due_date',
+        'value',
+        'charges.id as id_charge',
+        'paid'
       )
-      .from("charges")
-      .leftJoin("clients", "clients.id", "charges.client_id")
-      .where("charges.id", "=", id_charge)
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.client_id')
+      .where('charges.id', '=', id_charge)
       .first();
 
     if (!chargeExists || chargeExists.length === 0) {
-      return res.status(404).json({ error: "cobrança não encontrada" });
+      return res.status(404).json({ error: errors.chargeNotFound });
     }
 
     if (
       chargeExists.paid === false &&
       chargeExists.due_date < currentMoment()
     ) {
-      chargeExists.status = "Vencida";
+      chargeExists.status = 'Vencida';
     } else if (
       chargeExists.paid === false &&
       chargeExists.due_date > currentMoment()
     ) {
-      chargeExists.status = "Pendente";
+      chargeExists.status = 'Pendente';
     } else {
-      chargeExists.status = "Paga";
+      chargeExists.status = 'Paga';
     }
 
-    chargeExists.due_date = format(chargeExists.due_date, "dd-MM-yyyy");
+    chargeExists.due_date = format(chargeExists.due_date, 'dd-MM-yyyy');
     delete chargeExists.paid;
 
     return res.status(200).json({ data: chargeExists });

@@ -2,7 +2,7 @@ const loginSchema = require('../validations/loginSchema')
 const knex = require('../scripts/conection');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { errors } = require('../scripts/error-messages');
+const errors = require('../scripts/error-messages');
 
 const login = async (req, res) => {
     const { email, password } = req.body;
@@ -33,7 +33,7 @@ const login = async (req, res) => {
             token
         });
     } catch (error) {
-        return res.status(400).json({ "mensagem": error.message });
+        return res.status(400).json({ 'message': error.message });
     }
 
 }

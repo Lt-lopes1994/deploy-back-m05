@@ -1,9 +1,9 @@
 const bcrypt = require('bcrypt');
-
 const knex = require('../scripts/conection');
-
-const { errors } = require('../scripts/error-messages');
+const errors = require('../scripts/error-messages');
+const messages = require('../scripts/messages');
 const fieldsToUser = require('../validations/requiredFields');
+const messages = require('../scripts/messages');
 
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
@@ -16,7 +16,7 @@ const registerUser = async (req, res) => {
             .first();
 
         if (getEmail) {
-            return res.status(400).json(errors.userExists);
+            return res.status(400).json({ 'error': errors.userExists });
         }
 
         const SALT = 10;
@@ -26,12 +26,12 @@ const registerUser = async (req, res) => {
             .insert({ name, email, password: hash });
 
         if (!addUser) {
-            return res.status(400).json(errors.couldNotSignin);
+            return res.status(400).json({ 'error': errors.couldNotSignin });
         }
 
-        return res.status(201).json();
+        return res.status(201).json({ 'message': messages.userRegisteredSuccessfully });
     } catch (error) {
-        return res.status(400).json(error.message);
+        return res.status(400).json({ 'message': error.message });
     }
 };
 
@@ -44,12 +44,12 @@ const informationToTheUserHimself = async (req, res) => {
             .first();
 
         if (!user) {
-            return res.status(404).json(errors.userNotFound);
+            return res.status(404).json({ 'error': errors.userNotFound });
         }
 
-        return res.status(200).json(user);
+        return res.status(200).json({ 'data': user });
     } catch (error) {
-        return res.status(400).json(error.message);
+        return res.status(400).json({ 'message': error.message });
     }
 };
 
@@ -64,7 +64,7 @@ const updateUser = async (req, res) => {
             .first();
 
         if (!user) {
-            return res.status(404).json(errors.userNotFound);
+            return res.status(404).json({ 'error': errors.userNotFound });
         }
 
         const getEmail = await knex('users')
@@ -73,7 +73,7 @@ const updateUser = async (req, res) => {
             .first();
 
         if (getEmail) {
-            return res.status(400).json(errors.userExists);
+            return res.status(400).json({ 'error': errors.userExists });
         }
 
         const SALT = 10;
@@ -84,12 +84,12 @@ const updateUser = async (req, res) => {
             .where({ id: userLogin.id });
 
         if (!updatedUser) {
-            return res.status(400).json(errors.userUpdate);
+            return res.status(400).json({ 'error': errors.userUpdate });
         }
 
         return res.status(204).json();
     } catch (error) {
-        return res.status(400).json(error.message);
+        return res.status(400).json({ 'message': error.message });
     }
 };
 
@@ -102,7 +102,7 @@ const deleteUser = async (req, res) => {
             .where({ id: userLogin.id }).first();
 
         if (!user) {
-            return res.status(404).json(errors.userNotFound);
+            return res.status(404).json({ 'error': errors.userNotFound });
         }
 
         const deletedUser = await knex('users')
@@ -110,12 +110,12 @@ const deleteUser = async (req, res) => {
             .where({ id: userLogin.id });
 
         if (!deletedUser) {
-            return res.status(400).json(errors.userDelete);
+            return res.status(400).json({ 'error': errors.userDelete });
         }
 
         return res.status(204).json();
     } catch (error) {
-        return res.status(400).json(error.message);
+        return res.status(400).json({ 'message': error.message });
     }
 }
 
