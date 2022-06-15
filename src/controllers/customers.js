@@ -155,7 +155,7 @@ const allCustomersUpToDate = async (req, res) => {
 
     const customersData = [];
 
-    for (let customer of dueDateFormat) {
+    for (let customer of allCustomers) {
       const chargesCustomer = await knex('charges').where({
         client_id: customer.id,
       });
