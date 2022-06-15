@@ -21,7 +21,7 @@ const chargesPaid = async (req, res) => {
 
     return res.status(200).json(totalAmountBillsPaid);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -44,7 +44,7 @@ const overdueCharges = async (req, res) => {
 
     return res.status(200).json(totalAmountOverdueCharges);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -66,7 +66,7 @@ const anticipatedCharges = async (req, res) => {
 
     return res.status(200).json(totalAmountExpectedAccounts);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -97,7 +97,7 @@ const highlightsOverdueCollections = async (req, res) => {
 
     return res.status(200).json(expiredHighlight);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -116,7 +116,7 @@ const allOverdueCharges = async (req, res) => {
 
     return res.status(200).json(expiredHighlight);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -147,7 +147,7 @@ const highlightsExpectedCharges = async (req, res) => {
 
     return res.status(200).json(predictedHighlight);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -166,7 +166,7 @@ const allAnticipatedCharges = async (req, res) => {
 
     return res.status(200).json(predictedHighlight);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -196,7 +196,7 @@ const highlightsPaidCharges = async (req, res) => {
 
     return res.status(200).json(paidHighlights);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -214,7 +214,7 @@ const allChargesPaid = async (req, res) => {
 
     return res.status(200).json(paidHighlights);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -223,14 +223,14 @@ const billingRegister = async (req, res) => {
   const { user_id, description, due_date, value, status } = req.body;
 
   if (!client_id) {
-    return res.status(400).json({ error: errors.enterClientIdParams });
+    return res.status(400).json({ 'error': errors.enterClientIdParams });
   }
 
   try {
     const clientExist = await knex('clients').where({ id: client_id }).first();
 
     if (!clientExist) {
-      return res.status(404).json({ error: errors.thereIsNoSuchCustomer });
+      return res.status(404).json({ 'error': errors.thereIsNoSuchCustomer });
     }
 
     await billingRegisterSchema.validate(req.body);
@@ -238,7 +238,7 @@ const billingRegister = async (req, res) => {
     const userExist = await knex('users').where({ id: user_id }).first();
 
     if (!userExist) {
-      return res.status(404).json({ error: errors.thereIsNoSuchUser });
+      return res.status(404).json({ 'error': errors.thereIsNoSuchUser });
     }
 
     const newCharge = await knex('charges')
@@ -258,9 +258,9 @@ const billingRegister = async (req, res) => {
         .json({ error: errors.unableToRegisterTheCharge });
     }
 
-    return res.status(201).json({ message: messages.billingSuccessfullyRegistered });
+    return res.status(201).json({ 'message': messages.billingSuccessfullyRegistered });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -299,15 +299,15 @@ const billingList = async (req, res) => {
         charge.status = 'Paga';
       }
 
-      charge.due_date = format(charge.due_date, 'yyyy-MM-dd');
+      charge.due_date = format(charge.due_date, 'dd-MM-yyyy');
       delete charge.paid;
 
       return charge;
     });
 
-    return res.status(200).json({ data: listCharges });
+    return res.status(200).json({ 'data': listCharges });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -317,7 +317,7 @@ const billingEdit = async (req, res) => {
 
   if (!description && !paid && !value && !due_date) {
     return res.status(400).json({
-      error:
+      'error':
         errors.itIsNecessaryToInformAtLeastOneFieldToUpdateTheBilling,
     });
   }
@@ -339,14 +339,14 @@ const billingEdit = async (req, res) => {
     if (!chargeUpdate || chargeUpdate.length === 0) {
       return res
         .status(400)
-        .json({ error: errors.unableToUpdateBilling });
+        .json({ 'error': errors.unableToUpdateBilling });
     }
 
     return res
       .status(200)
-      .json({ message: messages.billingUpdateSuccessfullyCompleted });
+      .json({ 'message': messages.billingUpdateSuccessfullyCompleted });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -395,9 +395,9 @@ const deleteCharge = async (req, res) => {
         .json({ error: errors.theChargeCannotBeDeleted });
     }
 
-    return res.status(200).json({ message: messages.chargeDeletedSuccessfully });
+    return res.status(200).json({ 'message': messages.chargeDeletedSuccessfully });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
@@ -440,9 +440,9 @@ const billingDetails = async (req, res) => {
     chargeExists.due_date = format(chargeExists.due_date, 'dd-MM-yyyy');
     delete chargeExists.paid;
 
-    return res.status(200).json({ data: chargeExists });
+    return res.status(200).json({ 'data': chargeExists });
   } catch (error) {
-    return res.status(400).json({ error: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 

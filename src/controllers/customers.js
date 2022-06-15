@@ -64,7 +64,7 @@ const delinquentCustomerHighligths = async (req, res) => {
     }
 
     const dueDateFormat = sampleDelinquentCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, 'yyyy-MM-dd');
+      delinquent.due_date = format(delinquent.due_date, 'dd-MM-yyyy');
       return delinquent;
     });
 
@@ -89,7 +89,7 @@ const allDelinquentCustomers = async (req, res) => {
     }
 
     const dueDateFormat = sampleDelinquentCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, 'yyyy-MM-dd');
+      delinquent.due_date = format(delinquent.due_date, 'dd-MM-yyyy');
       return delinquent;
     });
 
@@ -109,9 +109,14 @@ const highlightsCustomersUpToDate = async (req, res) => {
       return res.status(200).json([]);
     }
 
+    const dueDateFormat = allCustomers.map((customerUpToDate) => {
+      customerUpToDate.due_date = format(customerUpToDate.due_date, 'dd-MM-yyyy');
+      return customerUpToDate;
+    });
+
     const filterCustomers = [];
 
-    for (let customer of allCustomers) {
+    for (let customer of dueDateFormat) {
       const chargesCustomer = await knex('charges').where({
         client_id: customer.id,
       });
@@ -119,7 +124,7 @@ const highlightsCustomersUpToDate = async (req, res) => {
       customer.charges = [];
       for (let charge of chargesCustomer) {
         if (!charge.paid && charge.due_date < currentMoment()) {
-          break;
+          return;
         }
         if (!charge.paid && charge.due_date > currentMoment() || charge.paid) {
           if (customer.charges.length < 1) {
@@ -135,7 +140,14 @@ const highlightsCustomersUpToDate = async (req, res) => {
       }
     }
 
-    return res.status(200).json({ 'data': filterCustomers });
+    const customersUpToDate = {
+      data: {
+        customer: filterCustomers.name,
+        charges: filterCustomers.charges
+      },
+    };
+
+    return res.status(200).json(customersUpToDate);
   } catch (error) {
     return res.status(400).json({ 'message': error.message });
   }
@@ -152,15 +164,18 @@ const allCustomersUpToDate = async (req, res) => {
       .offset(p)
       .orderBy('id');
 
-    console.log(allCustomers);
-
     if (!allCustomers || allCustomers.length === 0) {
       return res.status(200).json([]);
     }
 
+    const dueDateFormat = allCustomers.map((customerUpToDate) => {
+      customerUpToDate.due_date = format(customerUpToDate.due_date, 'dd-MM-yyyy');
+      return customerUpToDate;
+    });
+
     const customersData = [];
 
-    for (let customer of allCustomers) {
+    for (let customer of dueDateFormat) {
       const chargesCustomer = await knex('charges').where({
         client_id: customer.id,
       });
