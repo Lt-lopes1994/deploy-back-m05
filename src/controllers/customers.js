@@ -132,7 +132,21 @@ const highlightsCustomersUpToDate = async (req, res) => {
       }
     }
 
-    return res.status(200).json(chargesClients);
+    console.log(chargesClients);
+
+
+    const formatCustomersUpToDate = [];
+
+    for (let i = 0; i < chargesClients.length; i++) {
+      formatCustomersUpToDate.push({
+        name: chargesClients[i].name,
+        due_date: format(chargesClients[i].due_date, 'yyyy-MM-dd'),
+        value: chargesClients[i].value,
+        id: chargesClients[i].id
+      })
+    }
+
+    return res.status(200).json(formatCustomersUpToDate);
   } catch (error) {
     return res.status(400).json({ 'message': error.message });
   }
