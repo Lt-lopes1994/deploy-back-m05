@@ -46,7 +46,7 @@ const registerCustomer = async (req, res) => {
   }
 };
 
-const currentMoment = () => format(new Date(), 'dd-MM-yyyy');
+const currentMoment = () => format(new Date(), 'yyyy-MM-dd');
 
 const delinquentCustomerHighligths = async (req, res) => {
   try {
