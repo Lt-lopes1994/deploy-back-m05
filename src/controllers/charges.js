@@ -25,7 +25,7 @@ const chargesPaid = async (req, res) => {
   }
 };
 
-const currentMoment = () => new Date();
+const currentMoment = () => format(new Date(), 'dd-MM-yyyy');
 
 const overdueCharges = async (req, res) => {
   try {
