@@ -25,7 +25,7 @@ const chargesPaid = async (req, res) => {
   }
 };
 
-const currentMoment = () => format(new Date(), 'yyyy-MM-dd');
+const currentMoment = () => new Date();
 
 const overdueCharges = async (req, res) => {
   try {
@@ -299,7 +299,7 @@ const billingList = async (req, res) => {
         charge.status = 'Paga';
       }
 
-      charge.due_date = format(charge.due_date, 'dd-MM-yyyy');
+      charge.due_date = format(charge.due_date, 'yyyy-MM-dd');
       delete charge.paid;
 
       return charge;
@@ -437,7 +437,7 @@ const billingDetails = async (req, res) => {
       chargeExists.status = 'Paga';
     }
 
-    chargeExists.due_date = format(chargeExists.due_date, 'dd-MM-yyyy');
+    chargeExists.due_date = format(chargeExists.due_date, 'yyyy-MM-dd');
     delete chargeExists.paid;
 
     return res.status(200).json({ 'data': chargeExists });

@@ -241,7 +241,7 @@ const customerDetail = async (req, res) => {
         charge.status = "Paga";
       }
 
-      charge.due_date = format(charge.due_date, "dd-MM-yyyy");
+      charge.due_date = format(charge.due_date, "yyyy-MM-dd");
       delete charge.paid;
 
       return charge;

@@ -46,7 +46,7 @@ const registerCustomer = async (req, res) => {
   }
 };
 
-const currentMoment = () => format(new Date(), 'yyyy-MM-dd');
+const currentMoment = () => new Date();
 
 const delinquentCustomerHighligths = async (req, res) => {
   try {
@@ -64,7 +64,7 @@ const delinquentCustomerHighligths = async (req, res) => {
     }
 
     const dueDateFormat = sampleDelinquentCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, 'dd-MM-yyyy');
+      delinquent.due_date = format(delinquent.due_date, 'yyyy-MM-dd');
       return delinquent;
     });
 
@@ -89,7 +89,7 @@ const allDelinquentCustomers = async (req, res) => {
     }
 
     const dueDateFormat = sampleDelinquentCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, 'dd-MM-yyyy');
+      delinquent.due_date = format(delinquent.due_date, 'yyyy-MM-dd');
       return delinquent;
     });
 
@@ -110,7 +110,7 @@ const highlightsCustomersUpToDate = async (req, res) => {
     }
 
     const dueDateFormat = allCustomers.map((customerUpToDate) => {
-      customerUpToDate.due_date = format(customerUpToDate.due_date, 'dd-MM-yyyy');
+      customerUpToDate.due_date = format(customerUpToDate.due_date, 'yyyy-MM-dd');
       return customerUpToDate;
     });
 
@@ -169,7 +169,7 @@ const allCustomersUpToDate = async (req, res) => {
     }
 
     const dueDateFormat = allCustomers.map((customerUpToDate) => {
-      customerUpToDate.due_date = format(customerUpToDate.due_date, 'dd-MM-yyyy');
+      customerUpToDate.due_date = format(customerUpToDate.due_date, 'yyyy-MM-dd');
       return customerUpToDate;
     });
 
@@ -282,7 +282,7 @@ const customerDetail = async (req, res) => {
         charge.status = 'Paga';
       }
 
-      charge.due_date = format(charge.due_date, 'dd-MM-yyyy');
+      charge.due_date = format(charge.due_date, 'yyyy-MM-dd');
       delete charge.paid;
 
       return charge;
