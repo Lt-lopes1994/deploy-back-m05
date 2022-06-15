@@ -118,14 +118,16 @@ const highlightsCustomersUpToDate = async (req, res) => {
           client_id: customer.id,
         });
 
-      for (let charge of chargesCustomer) {
+      const checkOverdueCharge = chargesCustomer.find(
+        (charge) => !charge.paid && charge.due_date < currentMoment()
+      );
 
-        if (!charge.paid && charge.due_date < currentMoment()) {
-          break;
-        }
-        if (!charge.paid && charge.due_date > currentMoment() || charge.paid) {
-          chargesClients.push(charge);
-          break;
+      if (!checkOverdueCharge) {
+        for (let charge of chargesCustomer) {
+          if (!charge.paid && charge.due_date > currentMoment() || charge.paid) {
+            chargesClients.push(charge);
+            break;
+          }
         }
       }
     }
