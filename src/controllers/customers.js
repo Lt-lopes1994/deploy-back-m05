@@ -68,6 +68,14 @@ const delinquentCustomerHighligths = async (req, res) => {
       return delinquent;
     });
 
+    dueDateFormat.map((highlight) => {
+      {
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
+      }
+    });
+
     return res.status(200).json({ 'data': dueDateFormat });
   } catch (error) {
     return res.status(400).json({ 'message': error.message });
@@ -77,7 +85,7 @@ const delinquentCustomerHighligths = async (req, res) => {
 const allDelinquentCustomers = async (req, res) => {
   try {
     const sampleDelinquentCustomers = await knex
-      .select('clients.name', 'due_date', 'value', 'clients.id')
+      .select('clients.name', 'due_date', 'clients.id')
       .from('charges')
       .leftJoin('clients', 'clients.id', 'charges.client_id')
       .where('paid', '=', false)
@@ -131,10 +139,6 @@ const highlightsCustomersUpToDate = async (req, res) => {
         }
       }
     }
-
-    console.log(chargesClients);
-
-
     const formatCustomersUpToDate = [];
 
     for (let i = 0; i < chargesClients.length; i++) {
@@ -145,6 +149,14 @@ const highlightsCustomersUpToDate = async (req, res) => {
         id: chargesClients[i].id
       })
     }
+
+    formatCustomersUpToDate.map((highlight) => {
+      {
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
+      }
+    });
 
     return res.status(200).json(formatCustomersUpToDate);
   } catch (error) {
@@ -266,6 +278,10 @@ const customerDetail = async (req, res) => {
     }
 
     const checkBillingStatus = customerCharges.map((charge) => {
+      (charge.value = (charge.value / 100)
+        .toFixed(2)
+        .replace('.', ','));
+
       if (charge.paid === false && charge.due_date < currentMoment()) {
         charge.status = 'Vencida';
       }

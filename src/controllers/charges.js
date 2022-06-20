@@ -86,12 +86,9 @@ const highlightsOverdueCollections = async (req, res) => {
 
     expiredHighlight.map((highlight) => {
       {
-        highlight.name,
-          highlight.id_charge,
-          highlight.client_id,
-          (highlight.value = (highlight.value / 100)
-            .toFixed(2)
-            .replace('.', ','));
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
       }
     });
 
@@ -114,6 +111,13 @@ const allOverdueCharges = async (req, res) => {
       return res.status(200).json([]);
     }
 
+    expiredHighlight.map((highlight) => {
+      {
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
+      }
+    });
     return res.status(200).json(expiredHighlight);
   } catch (error) {
     return res.status(400).json({ 'message': error.message });
@@ -136,12 +140,9 @@ const highlightsExpectedCharges = async (req, res) => {
 
     predictedHighlight.map((highlight) => {
       {
-        highlight.name,
-          highlight.id_charge,
-          highlight.client_id,
-          (highlight.value = (highlight.value / 100)
-            .toFixed(2)
-            .replace('.', ','));
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
       }
     });
 
@@ -164,6 +165,14 @@ const allAnticipatedCharges = async (req, res) => {
       return res.status(200).json([]);
     }
 
+    predictedHighlight.map((highlight) => {
+      {
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
+      }
+    });
+
     return res.status(200).json(predictedHighlight);
   } catch (error) {
     return res.status(400).json({ 'message': error.message });
@@ -185,12 +194,9 @@ const highlightsPaidCharges = async (req, res) => {
 
     paidHighlights.map((highlight) => {
       {
-        highlight.name,
-          highlight.id_charge,
-          highlight.client_id,
-          (highlight.value = (highlight.value / 100)
-            .toFixed(2)
-            .replace('.', ','));
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
       }
     });
 
@@ -211,6 +217,14 @@ const allChargesPaid = async (req, res) => {
     if (!paidHighlights || paidHighlights.length === 0) {
       return res.status(200).json([]);
     }
+
+    paidHighlights.map((highlight) => {
+      {
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
+      }
+    });
 
     return res.status(200).json(paidHighlights);
   } catch (error) {
@@ -289,6 +303,10 @@ const billingList = async (req, res) => {
     }
 
     const listCharges = charges.map((charge) => {
+      (charge.value = (charge.value / 100)
+        .toFixed(2)
+        .replace('.', ','));
+
       if (charge.paid === false && charge.due_date < currentMoment()) {
         charge.status = 'Vencida';
       }
@@ -439,6 +457,8 @@ const billingDetails = async (req, res) => {
 
     chargeExists.due_date = format(chargeExists.due_date, 'yyyy-MM-dd');
     delete chargeExists.paid;
+
+    chargeExists.value = (chargeExists.value / 100).toFixed(2).replace('.', ',');
 
     return res.status(200).json({ 'data': chargeExists });
   } catch (error) {
