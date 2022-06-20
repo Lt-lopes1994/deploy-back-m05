@@ -34,29 +34,17 @@ const registerUser = async (req, res) => {
 };
 
 const informationToTheUserHimself = async (req, res) => {
-  const userLogin = req.user;
-
-  try {
-    const user = await knex("users").where({ id: userLogin.id }).first();
-
-    if (!user) {
-      return res.status(404).json({ error: errors.userNotFound });
-    }
-
-    return res.status(200).json({ data: user });
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
-  }
+  return res.status(200).json(req.user);
 };
 
 const updateUser = async (req, res) => {
-  const userLogin = req.user;
+  const { id } = req.user;
   const { name, cpf, email, phone, password } = req.body;
 
   try {
     const user = await knex("users")
       .select("id", "name", "email", "cpf", "phone", "password")
-      .where({ id: userLogin.id })
+      .where(id)
       .first();
 
     if (!user) {
