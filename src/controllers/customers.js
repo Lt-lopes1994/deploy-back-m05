@@ -298,8 +298,8 @@ const customerUpdate = async (req, res) => {
   try {
     await customerUpdateSchema.validate(req.body);
 
-    const customerExists = await knex("client")
-      .where("client.id", "=", id_customer)
+    const customerExists = await knex("clients")
+      .where("clients.id", "=", id_customer)
       .first();
 
     if (!customerExists || customerExists.length === 0) {
@@ -307,16 +307,16 @@ const customerUpdate = async (req, res) => {
     }
 
     if (email) {
-      const checkEmail = await knex("client").where({ email }).first();
+      const checkEmail = await knex("clients").where({ email }).first();
 
       if (checkEmail) {
         return res.status(400).json({ error: "email já cadastrado" });
       }
     }
 
-    const clientEdition = await knex("client")
+    const clientEdition = await knex("clients")
       .update(req.body)
-      .where("client.id", "=", id_customer);
+      .where("clients.id", "=", id_customer);
 
     if (!clientEdition || clientEdition.length === 0) {
       return res
@@ -326,9 +326,9 @@ const customerUpdate = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "atualização do cliente concluída com sucesso" });
+      .json({ 'message': "atualização do cliente concluída com sucesso" });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ 'message': error.message });
   }
 };
 

@@ -4,6 +4,7 @@ const knex = require('../scripts/conection');
 const userSchema = require('../validations/userSchema');
 const fieldsToUser = require('../validations/requiredFields');
 const usersTemplate = require('../templates/usersTemplate');
+const userUpdateSchema = require("../validations/userUpdateSchema");
 const messages = require('../scripts/messages');
 
 const { errors } = require('../scripts/error-messages');
@@ -36,62 +37,59 @@ const informationToTheUserHimself = async (req, res) => {
   return res.status(200).json(req.user);
 };
 
-/*const updateUser = async (req, res) => {
-  const { id } = req.user;
-  const { name, cpf, email, phone, password } = req.body;
- 
-  try {
-    const user = await knex("users")
-      .select("id", "name", "email", "cpf", "phone", "password")
-      .where(id)
-      .first();
- 
-        if (!addUser) {
-            return res.status(400).json(errors.couldNotSignin);
-        }
- 
-        return res.status(201).json();
-    } catch (error) {
-        return res.status(400).json(error.message);
-    }
-};
-*/
-
-
 const updateUser = async (req, res) => {
   const { id } = req.user;
-  let { name, email, password, cpf, phone } = req.body;
+  const { name, email, cpf, phone, password } = req.body;
+
+  if (
+    !name &&
+    !email &&
+    !phone &&
+    !cpf &&
+    !password
+  ) {
+    return res
+      .status(400)
+      .json({
+        error:
+          "é necessário informar ao menos um campo para fazer a atualização do usuário"
+      });
+  }
 
   try {
-    await userSchema.editUser.validate(req.body);
-    const getUser = await usersTemplate.userExists(id);
-    if (!getUser) {
-      return res.status(404).json(errors.userNotFound);
+    await userUpdateSchema.validate(req.body);
+
+    const userExists = await knex("users")
+      .where("users.id", "=", id)
+      .first();
+
+    if (!userExists || userExists.length === 0) {
+      return res.status(404).json({ 'message': 'usuário não encontrado' });
     }
 
-    if (password) {
-      password = await bcrypt.hash(password.trim(), 10);
-    }
+    if (email) {
+      const checkEmail = await knex('users').where({ email }).first();
 
-    if (email && email !== req.user.email) {
-      const getEmail = await knex('users')
-        .where({ email })
-        .first();
-
-      if (getEmail) {
-        return res.status(400).json(errors.userExists);
+      if (checkEmail) {
+        return res.status(400).json({ 'message': 'email já cadastrado' });
       }
     }
 
-    const updatedUser = await usersTemplate.updateUser(id, name, email, password, cpf, phone);
+    const userEdition = await knex("users")
+      .update(req.body)
+      .where("users.id", "=", id);
 
-    if (!updatedUser) {
-      return res.status(400).json(errors.userUpdate);
+    if (!userEdition || userEdition.length === 0) {
+      return res
+        .status(400)
+        .json({ 'message': 'não foi possível atualizar o usuário' });
     }
 
-    return res.status(204).json(messages.userUpdate);
+    return res
+      .status(200)
+      .json({ 'message': 'atualização do usuário concluída com sucesso' });
   } catch (error) {
-    return res.status(400).json(error.message);
+    return res.status(400).json({ 'message': error.message });
   }
 };
 
