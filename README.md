@@ -19,6 +19,11 @@
 
 ---
 
+## Coisas que não poderão ser feitas
+- Excluir cliente
+
+___
+
 ### POST - Cadastro (/signUp)
 
 #### Dados enviados
@@ -158,7 +163,21 @@ HTTP Status 400
 
 ---
 
-### PATCH - Editar perfil do usuário (/updateUser)
+### GET - Informações do perfil de usuário (/user)
+
+#### Dados enviados
+- Token
+
+#### Dados retornados
+- Sucesso ou erro
+
+#### Objetivos gerais
+- Verificar se o token é válido
+- Retornar o valor total de todas as cobranças pagas
+
+---
+
+### PATCH - Editar perfil do usuário (/user/updateUser)
 
 #### Dados enviados
 - token
@@ -975,207 +994,5 @@ HTTP Status 404
          {
     "message": "O cliente não possui cobranças"
         }
-    
----
-
-### GET - Listagem de cobranças (/billingList)
-
-#### Dados enviados
-- token
-
-
-#### Dados retornados
-- Sucesso 
-
-```javascript
-
-// GET/billingList
-{
-"data":
-    	{
-			"name": "José oreia seca",
-			"id_charge": 4,
-			"value": 150000,
-			"due_date": "2022-11-22",
-			"description": "Ums conclusão de curso cara",
-			"status": "Paga"
-		},
-		{
-			"name": "José oreia seca",
-			"id_charge": 3,
-			"value": 15000000,
-			"due_date": "2022-11-22",
-			"description": "Ums conclusão de curso cara",
-			"status": "Paga"
-		},
-		{
-			"name": "Avelino Costa",
-			"id_charge": 8,
-			"value": 25000,
-			"due_date": "2022-06-01",
-			"description": "Mercado do mês",
-			"status": "Vencida"
-		}
-    
-}
-
-HTTP Status 200
-
-{
-    []
-}
-
-HTTP Status 200
-```   
-    
-- Erro
-
-```javascript
-
-// GET/billingList
-{
-"error": error.message
-}
-
-HTTP Status 400
-
-
-```
-
-#### Objetivos gerais
-- Verificar o token
-- Se houver cobranças retonar elas
-- Não tendo cobranças retorne array vazio
-         
----
-
-### DELETE - Exclusão de cobrança(/deleteCharge/:id_charge)
-
-#### Dados enviados
-- token
-- id_customer
-- id_charge
-
-**Exemplo de requisição**
-
-```javascript
-
-// DELETE/deleteCharge/:id_charge
-{
-"id_customer": 12
-}
-
-```
-
-
-#### Dados retornados
-- Sucesso 
-
-```javascript
-
-// DELETE/deleteCharge/:id_charge
-{
-	"message": "cobrança excluída com sucesso"
-}
-
-HTTP Status 200
-```   
-    
-- Erro
-
-```javascript
-
-// DELETE/deleteCharge/:id_charge
-{
-"error": "id_customer obrigatório"
-}
-
-HTTP Status 400
-
--------------------------------
-
-{
-"error": "cobrança não encontrada"
-}
-
-HTTP Status 404
-
--------------------------------
-
-{
-"error": "cliente não encontrado"
-}
-
-HTTP Status 404
-
--------------------------------
-
-{
-"error": "a cobrança não pode ser deletada ou por estar vencida ou por estar paga"
-}
-
-HTTP Status 400
-
--------------------------------
-
-{
-"error": "a cobrança não pode ser excluída"
-}
-
-HTTP Status 400
-```
-
-#### Objetivos gerais
-- Verificar o token
-- Verificar o id_customer
-- Verificar o id_charge
-- Verificar se a cobrança pertence ao cliente
-- Excluir a cobrança
-    
----
-
-### GET - Detalhe da cobrança(/billingDetails/:id_charge)
-
-#### Dados enviados
-- token
-- id_charge
-
-#### Dados retornados
-- Sucesso 
-
-```javascript
-
-// GET/billingDetails/:id_charge
-{
-	"data": {
-		"name": "José Gomes",
-		"description": null,
-		"due_date": "28-05-2022",
-		"value": 81000,
-		"id_charge": 6,
-		"status": "Paga"
-	}
-}
-
-HTTP Status 200
-```   
-    
-- Erro
-
-```javascript
-
-// GET/billingDetails/:id_charge
-
-{
-"error": "cobrança não encontrada"
-}
-
-HTTP Status 404
-```
-
-#### Objetivos gerais
-- Verificar o token
-- Verificar o id_charge
-- Retornar os detalhes da cobrança
     
 ---
