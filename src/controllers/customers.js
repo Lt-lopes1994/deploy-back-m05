@@ -78,6 +78,7 @@ const delinquentCustomerHighligths = async (req, res) => {
             return delinquent;
         });
 
+<<<<<<< HEAD
         return res.status(200).json({ data: dueDateFormat });
     } catch (error) {
         return res.status(400).json({ message: error.message });
@@ -96,6 +97,35 @@ const allDelinquentCustomers = async (req, res) => {
         if (!sampleDelinquentCustomers || sampleDelinquentCustomers.length === 0) {
             return res.status(400).json([]);
         }
+=======
+    dueDateFormat.map((highlight) => {
+      {
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
+      }
+    });
+
+    return res.status(200).json({ 'data': dueDateFormat });
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
+};
+
+const allDelinquentCustomers = async (req, res) => {
+  try {
+    const sampleDelinquentCustomers = await knex
+      .select('clients.name', 'due_date', 'clients.id')
+      .from('charges')
+      .leftJoin('clients', 'clients.id', 'charges.client_id')
+      .where('paid', '=', false)
+      .where('due_date', '<', currentMoment())
+      .distinctOn('clients.id');
+
+    if (!sampleDelinquentCustomers || sampleDelinquentCustomers.length === 0) {
+      return res.status(400).json([]);
+    }
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
         const dueDateFormat = sampleDelinquentCustomers.map(delinquent => {
             delinquent.due_date = format(delinquent.due_date, 'yyyy-MM-dd');
@@ -110,6 +140,7 @@ const allDelinquentCustomers = async (req, res) => {
 };
 
 const highlightsCustomersUpToDate = async (req, res) => {
+<<<<<<< HEAD
     try {
         const sampleRegularizedCustomers = await knex
             .select("client.name", "due_date", "value", "client.id")
@@ -161,6 +192,62 @@ const allCustomersUpToDate = async (req, res) => {
     } catch (error) {
         return res.status(400).json({ 'message': error.message });
     }
+=======
+  try {
+    const allCustomers = await knex('clients')
+      .select('name', 'clients.id')
+      .orderBy('clients.id');
+
+    if (!allCustomers || allCustomers.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const chargesClients = []
+    for (let customer of allCustomers) {
+      const chargesCustomer = await knex('charges')
+        .leftJoin('clients', 'clients.id', 'charges.client_id')
+        .select('*')
+        .where({
+          client_id: customer.id,
+        });
+
+      const checkOverdueCharge = chargesCustomer.find(
+        (charge) => !charge.paid && charge.due_date < currentMoment()
+      );
+
+      if (!checkOverdueCharge) {
+        for (let charge of chargesCustomer) {
+          if (!charge.paid && charge.due_date > currentMoment() || charge.paid) {
+            chargesClients.push(charge);
+            break;
+          }
+        }
+      }
+    }
+    const formatCustomersUpToDate = [];
+
+    for (let i = 0; i < chargesClients.length; i++) {
+      formatCustomersUpToDate.push({
+        name: chargesClients[i].name,
+        due_date: format(chargesClients[i].due_date, 'yyyy-MM-dd'),
+        value: chargesClients[i].value,
+        id: chargesClients[i].id
+      })
+    }
+
+    formatCustomersUpToDate.map((highlight) => {
+      {
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
+      }
+    });
+
+    return res.status(200).json(formatCustomersUpToDate);
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 }
 
 const customers = async (req, res) => {
@@ -175,11 +262,17 @@ const customers = async (req, res) => {
             .limit(10)
             .orderBy('id');
 
+<<<<<<< HEAD
         if (!allCustomers || allCustomers.length === 0) {
             return res.status(200).json([]);
         }
 
         const customersData = [];
+=======
+    if (!allCustomers || allCustomers.length === 0) {
+      return res.status(200).json([]);
+    }
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
         for (let customer of allCustomers) {
 
@@ -273,9 +366,45 @@ const customerUpdate = async (req, res) => {
             .where('client.id', '=', id_customer)
             .first();
 
+<<<<<<< HEAD
         if (!customerExists || customerExists.length === 0) {
             return res.status(404).json({ 'error': 'cliente não encontrado' });
         }
+=======
+    const checkBillingStatus = customerCharges.map((charge) => {
+      (charge.value = (charge.value / 100)
+        .toFixed(2)
+        .replace('.', ','));
+
+      if (charge.paid === false && charge.due_date < currentMoment()) {
+        charge.status = 'Vencida';
+      }
+      if (charge.paid === false && charge.due_date > currentMoment()) {
+        charge.status = 'Pendente';
+      }
+      if (charge.paid === true) {
+        charge.status = 'Paga';
+      }
+
+      charge.due_date = format(charge.due_date, 'yyyy-MM-dd');
+      delete charge.paid;
+
+      return charge;
+    });
+
+    const detailing = {
+      data: {
+        customer,
+        charges: checkBillingStatus,
+      },
+    };
+
+    return res.status(200).json(detailing);
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
+};
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
         if (email) {
             const checkEmail = await knex('client')

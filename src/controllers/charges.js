@@ -57,7 +57,10 @@ const anticipatedCharges = async (req, res) => {
     } catch (error) {
         return res.status(400).json({ "message": error.message })
     }
-}
+
+
+ 
+};
 
 const highlightsOverdueCollections = async (req, res) => {
     try {
@@ -72,11 +75,24 @@ const highlightsOverdueCollections = async (req, res) => {
             return res.status(200).json([]);
         }
 
+        expiredHighlight.map((highlight) => {
+          {
+            (highlight.value = (highlight.value / 100)
+              .toFixed(2)
+              .replace('.', ','));
+          }
+        });
+    
+        return res.status(200).json(expiredHighlight);
+
         return res.status(200).json(expiredHighlight);
     } catch (error) {
         return res.status(400).json({ "message": error.message })
     }
-}
+
+    
+  
+};
 
 const allOverdueCharges = async (req, res) => {
     try {
@@ -89,12 +105,24 @@ const allOverdueCharges = async (req, res) => {
         if (!expiredHighlight || expiredHighlight.length === 0) {
             return res.status(400).json(errors.noReturnOverdueCharges);
         }
-
+        expiredHighlight.map((highlight) => {
+          {
+            (highlight.value = (highlight.value / 100)
+              .toFixed(2)
+              .replace('.', ','));
+          }
+        });
         return res.status(200).json(expiredHighlight);
+
+        
     } catch (error) {
         return res.status(400).json({ "mensagem": error.message })
     }
-}
+
+
+  
+ 
+};
 
 const highlightsExpectedCharges = async (req, res) => {
     try {
@@ -127,11 +155,23 @@ const allAnticipatedCharges = async (req, res) => {
             return res.status(400).json(errors.noReturnAnticipatedCharges);
         }
 
+        predictedHighlight.map((highlight) => {
+          {
+            (highlight.value = (highlight.value / 100)
+              .toFixed(2)
+              .replace('.', ','));
+          }
+        });
+
         return res.status(200).json(predictedHighlight);
     } catch (error) {
         return res.status(400).json({ "mensagem": error.message })
     }
-}
+
+   
+
+
+};
 
 const highlightsPaidCharges = async (req, res) => {
     try {
@@ -144,12 +184,22 @@ const highlightsPaidCharges = async (req, res) => {
         if (!paidHighlights || paidHighlights.length === 0) {
             return res.status(200).json([]);
         }
+        paidHighlights.map((highlight) => {
+          {
+            (highlight.value = (highlight.value / 100)
+              .toFixed(2)
+              .replace('.', ','));
+          }
+        });
 
         return res.status(200).json(paidHighlights);
     } catch (error) {
         return res.status(400).json({ "message": error.message })
     }
-}
+
+    
+
+};
 
 const allChargesPaid = async (req, res) => {
     try {
@@ -166,24 +216,53 @@ const allChargesPaid = async (req, res) => {
     } catch (error) {
         return res.status(400).json({ 'message': error.message })
     }
+<<<<<<< HEAD
 }
+=======
+
+    paidHighlights.map((highlight) => {
+      {
+        (highlight.value = (highlight.value / 100)
+          .toFixed(2)
+          .replace('.', ','));
+      }
+    });
+
+    return res.status(200).json(paidHighlights);
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
+};
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
 const billingRegister = async (req, res) => {
     const { client_id } = req.params;
     const { user_id, description, due_date, value, status } = req.body;
 
+<<<<<<< HEAD
     if (!client_id) {
         return res.status(400).json({ 'error': 'informe o client_id no params' });
     }
+=======
+  if (!client_id) {
+    return res.status(400).json({ 'error': errors.enterClientIdParams });
+  }
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
     try {
         const clientExist = await knex('client')
             .where({ id: client_id })
             .first();
 
+<<<<<<< HEAD
         if (!clientExist) {
             return res.status(404).json({ 'error': 'não existe esse cliente' });
         }
+=======
+    if (!clientExist) {
+      return res.status(404).json({ 'error': errors.thereIsNoSuchCustomer });
+    }
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
         await billingRegisterSchema.validate(req.body);
 
@@ -191,17 +270,31 @@ const billingRegister = async (req, res) => {
             .where({ id: user_id })
             .first();
 
+<<<<<<< HEAD
         if (!userExist) {
             return res.status(404).json({ 'error': 'não existe esse usuário' });
         }
+=======
+    if (!userExist) {
+      return res.status(404).json({ 'error': errors.thereIsNoSuchUser });
+    }
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
         const newCharge = await knex('charges')
             .insert({ user_id, client_id, value, paid: status, due_date })
             .returning('*');
 
+<<<<<<< HEAD
         if (!newCharge) {
             return res.status(400).json({ 'error': 'não foi possível cadastrar a cobrança' });
         }
+=======
+    return res.status(201).json({ 'message': messages.billingSuccessfullyRegistered });
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
+};
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
         return res.status(201).json({ 'message': 'cobrança cadastrada com sucesso' });
     } catch (error) {
@@ -209,6 +302,7 @@ const billingRegister = async (req, res) => {
     }
 }
 
+<<<<<<< HEAD
 const billingList = async (req, res) => {
     const { offset } = req.query;
 
@@ -257,6 +351,54 @@ const billingEdit = async (req, res) => {
 
     if (!description && !paid && !value && !due_date) {
         return res.status(400).json({ 'error': 'é necessário informar ao menos um campo para fazer a atualização da cobrança' });
+=======
+    const listCharges = charges.map((charge) => {
+      (charge.value = (charge.value / 100)
+        .toFixed(2)
+        .replace('.', ','));
+
+      if (charge.paid === false && charge.due_date < currentMoment()) {
+        charge.status = 'Vencida';
+      }
+      if (charge.paid === false && charge.due_date > currentMoment()) {
+        charge.status = 'Pendente';
+      }
+      if (charge.paid === true) {
+        charge.status = 'Paga';
+      }
+
+      charge.due_date = format(charge.due_date, 'yyyy-MM-dd');
+      delete charge.paid;
+
+      return charge;
+    });
+
+    return res.status(200).json({ 'data': listCharges });
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
+};
+
+const billingEdit = async (req, res) => {
+  const { id_charge } = req.params;
+  const { description, paid, value, due_date } = req.body;
+
+  if (!description && !paid && !value && !due_date) {
+    return res.status(400).json({
+      'error':
+        errors.itIsNecessaryToInformAtLeastOneFieldToUpdateTheBilling,
+    });
+  }
+  try {
+    await billingEditSchema.validate(req.body);
+
+    const chargeExists = await knex('charges')
+      .where('charges.id', '=', id_charge)
+      .first();
+
+    if (!chargeExists || chargeExists.length === 0) {
+      return res.status(404).json({ error: errors.chargeNotFound });
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
     }
     try {
         await billingEditSchema.validate(req.body);
@@ -265,6 +407,7 @@ const billingEdit = async (req, res) => {
             .where('charges.id', '=', id_charge)
             .first();
 
+<<<<<<< HEAD
         if (!chargeExists || chargeExists.length === 0) {
             return res.status(404).json({ 'error': 'cobrança não encontrada' });
         }
@@ -272,6 +415,21 @@ const billingEdit = async (req, res) => {
         const chargeUpdate = await knex('charges')
             .update(req.body)
             .where('charges.id', '=', id_charge);
+=======
+    if (!chargeUpdate || chargeUpdate.length === 0) {
+      return res
+        .status(400)
+        .json({ 'error': errors.unableToUpdateBilling });
+    }
+
+    return res
+      .status(200)
+      .json({ 'message': messages.billingUpdateSuccessfullyCompleted });
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
+};
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
         if (!chargeUpdate || chargeUpdate.length === 0) {
             return res.status(400).json({ 'error': 'não foi possível atualizar a cobrança' });
@@ -301,9 +459,17 @@ const deleteCharge = async (req, res) => {
             return res.status(404).json({ 'error': 'cobrança não encontrada' });
         }
 
+<<<<<<< HEAD
         const customerExists = await knex('client')
             .where('client.id', '=', id_customer)
             .first();
+=======
+    return res.status(200).json({ 'message': messages.chargeDeletedSuccessfully });
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
+};
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
         if (!customerExists || customerExists.length === 0) {
             return res.status(404).json({ 'error': 'cliente não encontrado' });
@@ -322,6 +488,7 @@ const deleteCharge = async (req, res) => {
             return res.status(400).json({ 'error': 'a cobrança não pode ser excluída' });
         }
 
+<<<<<<< HEAD
         return res.status(200).json({ 'message': 'cobrança excluída com sucesso' });
 
     } catch (error) {
@@ -360,6 +527,18 @@ const billingDetails = async (req, res) => {
         return res.status(400).json({ 'error': error.message })
     }
 }
+=======
+    chargeExists.due_date = format(chargeExists.due_date, 'yyyy-MM-dd');
+    delete chargeExists.paid;
+
+    chargeExists.value = (chargeExists.value / 100).toFixed(2).replace('.', ',');
+
+    return res.status(200).json({ 'data': chargeExists });
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
+};
+>>>>>>> bde9270da143c95c383d3c08a35e541f79f4f58d
 
 module.exports = {
     chargesPaid,
