@@ -26,7 +26,7 @@ const { chargesPaid,
     deleteCharge,
     billingDetails } = require('./controllers/charges');
 
-const checkLogin = require('./middlewares/tokenNeeded');
+const checkLogin = require('./middlewares/checkLogin');
 
 const routes = express();
 
