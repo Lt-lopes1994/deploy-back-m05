@@ -1,41 +1,48 @@
-const loginSchema = require('../validations/loginSchema')
-const knex = require('../scripts/conection');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const errors = require('../scripts/error-messages');
+const jwtSecret = process.env.JWT_SECRET
+
+const userSchema = require('../validations/userSchema')
+const knex = require('../scripts/conection');
+const { errors } = require('../scripts/error-messages');
+const { loginSuccess } = require('../scripts/messages');
 
 const login = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        await loginSchema.validate(req.body);
+        await userSchema.loginSchema.validate(req.body);
 
-        const user = await knex('users').where({ email }).first();
+        const getUser = await knex('users')
+            .where({ email })
+            .first();
 
-        if (!user) {
-            return res.status(404).json(errors.userNotFound);
-        }
-
-        const checkPassword = await bcrypt.compare(password, user.password);
-
-        if (!checkPassword) {
+        if (!getUser) {
             return res.status(400).json(errors.loginIncorrect);
         }
 
-        const idTokenUser = { id: user.id };
+        const correctPassword = await bcrypt.compare(password, getUser.password);
+        if (!correctPassword) {
+            return res.status(400).json(errors.loginIncorrect);
+        }
 
-        const token = jwt.sign(idTokenUser, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ id: getUser.id }, jwtSecret, { expiresIn: "2h" });
 
-        const { password: pass, ...userInformation } = user;
+        const {password: _, ...userData } = getUser;
 
-        return res.status(200).json({
-            user: userInformation,
-            token
+        return res.json({
+            user: {
+                id: getUser.id,
+                name: getUser.name,
+                email: getUser.email,
+            },
+            token,
+            message: loginSuccess
         });
     } catch (error) {
-        return res.status(400).json({ 'message': error.message });
-    }
+        return res.status(500).json(error.message);
+    };
 
-}
+};
 
 module.exports = login;
