@@ -116,23 +116,35 @@ HTTP Status 400
 - Token
 
 #### Dados retornados
-- Sucesso ou erro
+```javascript 
+{
+	"id": 1,
+	"name": "João",
+	"email": "joão@fakeemail.com",
+	"cpf": "99999944466",
+	"phone": "19999999999"
+}
+```
 
-#### Objetivos gerais
-- Verificar se o token é válido
-- Retornar o valor total de todas as cobranças pagas
+#### Erro
 
+```javascript
+{
+	"message": "jwt must be provided"
+}
+```
 ---
 
 ### PATCH - Editar perfil do usuário (/user/updateUser)
 
 #### Dados enviados
-- token
-- name
-- email
-- cpf
-- phone
-- new_password
+{
+	"id": 1,
+	"name": "João",
+	"email": "joão@fakeemail.com",
+	"cpf": "99999944466",
+	"phone": "19999999999"
+}
 
 **Exemplo de requisição**
 
