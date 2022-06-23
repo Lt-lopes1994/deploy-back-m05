@@ -4,7 +4,9 @@ const { errors } = require("../scripts/error-messages");
 const billingRegisterSchema = require("../validations/billingRegisterSchema");
 const billingEditSchema = require("../validations/billingEditSchema");
 
-const chargesPaid = async (req, res) => {
+const currentMoment = () => new Date();
+
+/*const chargesPaid = async (req, res) => {
   try {
     const totalAmountBillsPaid = await knex("charges")
       .select(knex.raw(`sum(value) as total_amount_bills_paid`))
@@ -23,8 +25,6 @@ const chargesPaid = async (req, res) => {
     return res.status(400).json({ message: error.message });
   }
 };
-
-const currentMoment = () => new Date();
 
 const overdueCharges = async (req, res) => {
   try {
@@ -57,7 +57,7 @@ const anticipatedCharges = async (req, res) => {
 
     if (
       Number(totalAmountExpectedAccounts.total_amount_expected_accounts) ===
-        0 ||
+      0 ||
       !totalAmountExpectedAccounts.total_amount_expected_accounts
     ) {
       return res.status(200).json(0);
@@ -67,7 +67,73 @@ const anticipatedCharges = async (req, res) => {
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
+};*/
+
+const totalAmountAllCharges = async (req, res) => {
+  try {
+    let totalAmountBillsPaid = await knex("charges")
+      .select(knex.raw(`sum(value) as total_amount_bills_paid`))
+      .where("paid", "=", true)
+      .first();
+
+    if (
+      Number(totalAmountBillsPaid.total_amount_bills_paid) === 0 ||
+      !totalAmountBillsPaid.total_amount_bills_paid
+    ) {
+      totalAmountBillsPaid.total_amount_bills_paid = 0;
+    }
+
+    let totalAmountOverdueCharges = await knex("charges")
+      .select(knex.raw(`sum(value) as total_amount_overdue_charges`))
+      .where("paid", "=", false)
+      .where("due_date", "<", currentMoment())
+      .first();
+
+    if (
+      Number(totalAmountOverdueCharges.total_amount_overdue_charges) === 0 ||
+      !totalAmountOverdueCharges.total_amount_overdue_charges
+    ) {
+      totalAmountOverdueCharges.total_amount_overdue_charges = 0;
+    }
+
+    let totalAmountExpectedAccounts = await knex("charges")
+      .select(knex.raw(`sum(value) as total_amount_expected_accounts`))
+      .where("paid", "=", false)
+      .where("due_date", ">", currentMoment())
+      .first();
+
+    if (
+      Number(totalAmountExpectedAccounts.total_amount_expected_accounts) ===
+      0 ||
+      !totalAmountExpectedAccounts.total_amount_expected_accounts
+    ) {
+      totalAmountExpectedAccounts.total_amount_expected_accounts = 0;
+    }
+
+    (totalAmountBillsPaid.total_amount_bills_paid = (totalAmountBillsPaid.total_amount_bills_paid / 100)
+      .toFixed(2)
+      .replace('.', ','));
+
+    (totalAmountExpectedAccounts.total_amount_expected_accounts = (totalAmountExpectedAccounts.total_amount_expected_accounts / 100)
+      .toFixed(2)
+      .replace('.', ','));
+
+    (totalAmountOverdueCharges.total_amount_overdue_charges = (totalAmountOverdueCharges.total_amount_overdue_charges / 100)
+      .toFixed(2)
+      .replace('.', ','));
+
+    const valueCollections = {
+      totalAmountBillsPaid: totalAmountBillsPaid.total_amount_bills_paid,
+      totalAmountExpectedAccounts: totalAmountExpectedAccounts.total_amount_expected_accounts,
+      totalAmountOverdueCharges: totalAmountOverdueCharges.total_amount_overdue_charges
+    };
+
+    return res.status(200).json(valueCollections);
+  } catch (error) {
+    return res.status(400).json({ 'message': error.message });
+  }
 };
+
 
 const highlightsOverdueCollections = async (req, res) => {
   try {
@@ -88,8 +154,6 @@ const highlightsOverdueCollections = async (req, res) => {
         highlight.value = (highlight.value / 100).toFixed(2).replace(".", ",");
       }
     });
-
-    return res.status(200).json(expiredHighlight);
 
     return res.status(200).json(expiredHighlight);
   } catch (error) {
@@ -433,9 +497,10 @@ const billingDetails = async (req, res) => {
 };
 
 module.exports = {
-  chargesPaid,
+  /*chargesPaid,
   overdueCharges,
-  anticipatedCharges,
+  anticipatedCharges,*/
+  totalAmountAllCharges,
   highlightsOverdueCollections,
   allOverdueCharges,
   highlightsExpectedCharges,

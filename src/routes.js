@@ -11,9 +11,10 @@ const { registerCustomer,
     customers,
     customerDetail,
     customerUpdate } = require('./controllers/customers');
-const { chargesPaid,
+const { /*chargesPaid,
     overdueCharges,
-    anticipatedCharges,
+    anticipatedCharges,*/
+    totalAmountAllCharges,
     highlightsOverdueCollections,
     allOverdueCharges,
     highlightsExpectedCharges,
@@ -38,9 +39,10 @@ routes.use(checkLogin);
 routes.get('/user', informationToTheUserHimself)
 routes.patch('/user/updateUser', updateUser);
 
-routes.get('/chargesPaid', chargesPaid);
+/*routes.get('/chargesPaid', chargesPaid);
 routes.get('/overdueCharges', overdueCharges);
-routes.get('/anticipatedCharges', anticipatedCharges);
+routes.get('/anticipatedCharges', anticipatedCharges);*/
+routes.get('/totalAmountAllCharges', totalAmountAllCharges);
 
 routes.get('/highlightsOverdueCollections', highlightsOverdueCollections);
 routes.get('/allOverdueCharges', allOverdueCharges);
