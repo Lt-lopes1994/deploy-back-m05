@@ -1,35 +1,5 @@
-# cobreBem
-
-## Coisas que poderão ser feitas
-- Fazer cadastro
-- Fazer login
-- Header
-    - Editar perfil
-- Home 
-    - Acesso ao resumo das cobranças
-    - Visualizar cobranças pagas
-    - Visualizar cobranças vencidas
-    - Visualizar cobranças previstas
-    - Visualizar os clientes inadimplentes
-    - Visualizar os clientes em dia
-- Clientes
-    - Adicionar cliente
-    - Pesquisar cliente
-    - Acesso a lista de clientes
-
----
-
-## Coisas que não poderão ser feitas
-- Excluir cliente
-
-___
 
 ### POST - Cadastro (/signUp)
-
-#### Dados enviados
-- name
-- email
-- password
 
 ### **Exemplo de requisição**
 
@@ -47,12 +17,6 @@ ___
 - Sucesso 
 
 ```javascript
-
-// POST/signUp
-{   
- "message": "usuário cadastrado com sucesso"
-}
-
 HTTP Status 201
 ```
     
@@ -78,24 +42,14 @@ HTTP Status 400
 -------------------------------
     
 {
-"error": "password precisa ter no minímo 8 caracteres"
+"error": "Senha precisa ter no minímo 8 caracteres"
 }
 
 HTTP Status 400
-
 ```
-
-#### Objetivos gerais
-- Verificar se o email já existe
-- Verificar se a senha possui no minímo 8 caracteres 
-
 ---
 
 ### POST - Login (/login)
-
-#### Dados enviados
-- email
-- password
 
 ### **Exemplo de requisição**
 
@@ -108,9 +62,6 @@ HTTP Status 400
 ```
 
 #### Dados retornados
-- token
-
-- Sucesso 
 
 ```javascript
 
@@ -134,7 +85,7 @@ HTTP Status 200
 
 // POST/login
 {
-"error": "email ou password estão incorretos"
+"error": "email ou senha estão incorretos"
 }
 
 HTTP Status 400
@@ -150,16 +101,12 @@ HTTP Status 404
 -------------------------------
     
 {
-"error": "password precisa ter no minímo 8 caracteres"
+"error": "senha precisa ter no minímo 8 caracteres"
 }
 
 HTTP Status 400
 
 ```
-
-#### Objetivos gerais
-- Verificar se o usuário existe
-- Verificar a senha
 
 ---
 
