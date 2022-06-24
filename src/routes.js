@@ -38,7 +38,7 @@ const routes = express();
 routes.post("/signup", registerUser);
 routes.post("/login", login);
 
-// routes.use(checkLogin);
+routes.use(checkLogin);
 
 routes.get("/user", informationToTheUserHimself);
 routes.patch("/user/updateUser", updateUser);
