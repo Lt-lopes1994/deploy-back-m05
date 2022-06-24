@@ -1,35 +1,25 @@
 const errors = {
-  userExists: "Já existe um usuário cadastrado com o e-mail informado.",
-  couldNotSignin: "Não foi possivel cadastrar o usuário.",
-  unregisteredCustomer: "Não foi possivel cadastrar o cliente.",
-  loginIncorrect: "Email ou senha incorretos.",
-  userNotFound: "Usuário não encontrado.",
-  nameX: "O Campo nome é obrigatorio.",
-  emailX: "O Campo email é obrigatório.",
-  cpfX: "O Campo CPF é obrigatório",
+  enterClientIdParams: "informe o client_id no params",
+  thereIsNoSuchCustomer: "não existe esse cliente",
+  thereIsNoSuchUser: "não existe esse usuário",
+  unableToRegisterTheCharge: "não foi possível cadastrar a cobrança",
+  itIsNecessaryToInformAtLeastOneFieldToUpdateTheBilling:
+    "é necessário informar ao menos um campo para fazer a atualização da cobrança",
+  unableToUpdateBilling: "não foi possível atualizar a cobrança",
+  itIsNecessaryToInformTheIdCustomer: "é necessário informar o id_customer",
+  chargeNotFound: "cobrança não encontrada",
+  theChargeCannotBeDeletedEitherBecauseItIsOverdueOrPaid:
+    "a cobrança não pode ser deletada ou por estar vencida ou por estar paga",
+  theChargeCannotBeDeleted: "a cobrança não pode ser excluída",
+  userExists: "já existe um usuário cadastrado com o e-mail informado",
   cpfExists: "CPF já cadastrado",
-  passwordX: "O Campo senha é obrigatorio.",
-  addressX: "O Campo endereço é obrigatório.",
-  transNonexistent: "Não foi possível encontrar troca",
-  catNonexistent: "A categoria indicada não existe",
-  transNotPossible: "Não foi possível adicionar essa troca",
-  transSuccess: "Transação deletada com sucesso",
-  descriptionX: "É necessário descrever a troca.",
-  priceX: "É necessário definir o valor da troca.",
-  dateX: "É necessário indicar a data troca.",
-  categoryIDX: "É necessário indicar em qual categoria se encaixa a troca.",
-  typeX: "É necessário informar qual o tipo da troca.",
-  wrongType: "O tipo indicado não existe.",
-  accountX: "É preciso ter uma conta acessar a dashboard",
-  tokenX:
-    "Para acessar este recurso um token de autenticação válido deve ser enviado.",
-  categoryX: "É necessário indicar em qual categoria se encaixa a troca.",
-  amountX: "É necessário indicar a quantidade para completar a troca.",
-  couldNotUpdateExchange: "Não foi possível atualizar a troca",
-  couldNotUpdateScore: "Não foi possível atualizar a pontuação",
-  exchangeNotFound: "Não foi possível encontrar a troca",
-  collectPointNotFound: "Não foi possivel encontrar o ponto de coleta.",
-  voucherNotFound: "Não foi possível encontrar o cupom.",
+  unregisteredCustomer: "não foi possivel cadastrar o cliente",
+  itIsNecessaryToInformAtLeastOneFieldToUpdateTheClient:
+    "é necessário informar ao menos um campo para fazer a atualização do cliente",
+  unableToUpdateClient: "não foi possível atualizar o cliente",
+  userNotFound: "usuário não encontrado",
+  loginIncorrect: "email ou senha incorretos",
+  couldNotSignin: "não foi possivel cadastrar o usuário",
   userUpdate: "Não foi possível atualizar o usuário",
   userDelete: "Não foi possível deletar o usuário.",
   userHasExchangeAndShopping:
@@ -44,7 +34,8 @@ const errors = {
     "Não foi possível ter acesso aos destaques das cobranças vencidas",
   noReturnAnticipatedCharges:
     "Não foi possível ter acesso aos destaques das cobranças previstas",
-  noReturnBillsPaid: "Não foi possível ter acesso as cobranças pagas",
+  noReturnBillsPaid:
+    "Não foi possível ter acesso aos destaques das cobranças pagas",
   noReturnFromDefaultingCustomers:
     "Não foi possível ter acesso aos destaques dos clientes inadimplentes",
   noDelinquentCustomers: "Não há clientes inadimplentes",
@@ -54,6 +45,8 @@ const errors = {
   thereAreNoChargesPaid: "Não há cobranças pagas",
   thereAreNoOverdueCharges: "Não há cobranças atrasadas",
   thereAreNoAnticipatedCharges: "Não há cobranças previstas",
+  notAuthorized: "não autorizado",
+  invalidToken: "token inválido",
 };
 
-module.exports = { errors };
+module.exports = errors;
