@@ -21,19 +21,19 @@ const registerCustomer = async (req, res) => {
   try {
     await registerCustomerSchema.validate(req.body);
 
-    const registeredEmail = await knex("users").where({ email }).first();
+    const registeredEmail = await knex("clients").where({ email }).first();
 
     if (registeredEmail) {
       return res.status(400).json(errors.userExists);
     }
 
-    const registeredCPF = await knex("users").where({ cpf }).first();
+    const registeredCPF = await knex("clients").where({ cpf }).first();
 
     if (registeredCPF) {
       return res.status(400).json(errors.cpfExists);
     }
 
-    const customer = await knex("users").insert({
+    const customer = await knex("clients").insert({
       name,
       email,
       cpf,
@@ -61,12 +61,12 @@ const currentMoment = () => new Date();
 const delinquentCustomerHighligths = async (req, res) => {
   try {
     const sampleDelinquentCustomers = await knex
-      .select("client.name", "due_date", "value", "client.id")
+      .select("clients.name", "due_date", "value", "clients.id")
       .from("charges")
-      .leftJoin("client", "client.id", "charges.client_id")
+      .leftJoin("clients", "clients.id", "charges.client_id")
       .where("paid", "=", false)
       .where("due_date", "<", currentMoment())
-      .distinctOn("client.id")
+      .distinctOn("clients.id")
       .limit(4);
 
     if (!sampleDelinquentCustomers || sampleDelinquentCustomers.length === 0) {
@@ -87,12 +87,12 @@ const delinquentCustomerHighligths = async (req, res) => {
 const allDelinquentCustomers = async (req, res) => {
   try {
     const sampleDelinquentCustomers = await knex
-      .select("client.name", "due_date", "value", "client.id")
+      .select("clients.name", "due_date", "value", "clients.id")
       .from("charges")
-      .leftJoin("client", "client.id", "charges.client_id")
+      .leftJoin("clients", "clients.id", "charges.client_id")
       .where("paid", "=", false)
       .where("due_date", "<", currentMoment())
-      .distinctOn("client.id");
+      .distinctOn("clients.id");
 
     if (!sampleDelinquentCustomers || sampleDelinquentCustomers.length === 0) {
       return res.status(400).json([]);
@@ -111,56 +111,69 @@ const allDelinquentCustomers = async (req, res) => {
 
 const highlightsCustomersUpToDate = async (req, res) => {
   try {
-    const sampleRegularizedCustomers = await knex
-      .select("client.name", "due_date", "value", "client.id")
-      .from("charges")
-      .leftJoin("client", "client.id", "charges.client_id")
-      .where("paid", "=", "true")
-      .orWhere("due_date", ">", currentMoment())
-      .distinctOn("client.id")
-      .limit(4);
-
-    if (
-      !sampleRegularizedCustomers ||
-      sampleRegularizedCustomers.length === 0
-    ) {
+    const allCustomers = await knex("clients")
+      .select("name", "clients.id")
+      .orderBy("clients.id");
+    if (!allCustomers || allCustomers.length === 0) {
       return res.status(200).json([]);
     }
+    const chargesClients = [];
+    for (let customer of allCustomers) {
+      const chargesCustomer = await knex("charges")
+        .leftJoin("clients", "clients.id", "charges.client_id")
+        .select("*")
+        .where({
+          client_id: customer.id,
+        });
 
-    const dueDateFormat = sampleRegularizedCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, "yyyy-MM-dd");
-      return delinquent;
-    });
+      const checkOverdueCharge = chargesCustomer.find(
+        (charge) => !charge.paid && charge.due_date < currentMoment()
+      );
 
-    return res.status(200).json({ data: dueDateFormat });
+      if (!checkOverdueCharge) {
+        for (let charge of chargesCustomer) {
+          if (
+            (!charge.paid && charge.due_date > currentMoment()) ||
+            charge.paid
+          ) {
+            chargesClients.push(charge);
+            break;
+          }
+        }
+      }
+    }
+
+    return res.status(200).json(chargesClients);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
 };
 
 const allCustomersUpToDate = async (req, res) => {
+  const { offset } = req.query;
+  const p = offset ? offset : 0;
   try {
-    const sampleRegularizedCustomers = await knex
-      .select("client.name", "due_date", "value", "client.id")
-      .from("charges")
-      .leftJoin("client", "client.id", "charges.client_id")
-      .where("paid", "=", "true")
-      .orWhere("due_date", ">", currentMoment())
-      .distinctOn("client.id");
-
-    if (
-      !sampleRegularizedCustomers ||
-      sampleRegularizedCustomers.length === 0
-    ) {
+    const allCustomers = await knex("clients")
+      .select("name", "cpf", "email", "phone", "id")
+      .offset(p)
+      .orderBy("id");
+    if (!allCustomers || allCustomers.length === 0) {
       return res.status(200).json([]);
     }
-
-    const dueDateFormat = sampleRegularizedCustomers.map((delinquent) => {
-      delinquent.due_date = format(delinquent.due_date, "yyyy-MM-dd");
-      return delinquent;
-    });
-
-    return res.status(200).json({ data: dueDateFormat });
+    const customersData = [];
+    for (let customer of allCustomers) {
+      const chargesCustomer = await knex("charges").where({
+        client_id: customer.id,
+      });
+      const checkOverdueCharge = chargesCustomer.find(
+        (charge) => !charge.paid && charge.due_date < currentMoment()
+      );
+      if (!checkOverdueCharge) {
+        customer.status = "Em dia";
+        customersData.push(customer);
+      }
+    }
+    return res.status(200).json(customersData);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -172,7 +185,7 @@ const customers = async (req, res) => {
   const p = offset ? offset : 0;
 
   try {
-    const allCustomers = await knex("client")
+    const allCustomers = await knex("clients")
       .select("name", "cpf", "email", "phone", "id")
       .offset(p)
       .limit(10)
@@ -202,7 +215,7 @@ const customers = async (req, res) => {
       customersData.push(customer);
     }
 
-    return res.status(200).json({ data: customersData });
+    return res.status(200).json(customersData);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -216,7 +229,7 @@ const customerDetail = async (req, res) => {
       .select(
         "name",
         "email",
-        "address",
+        "adress",
         "phone",
         "district",
         "cpf",
@@ -225,8 +238,8 @@ const customerDetail = async (req, res) => {
         "city",
         "uf"
       )
-      .from("client")
-      .where("client.id", "=", id_customer);
+      .from("clients")
+      .where("clients.id", "=", id_customer);
 
     if (!customer || customer.length === 0) {
       return res.status(200).json([]);
@@ -273,26 +286,24 @@ const customerDetail = async (req, res) => {
 
 const customerUpdate = async (req, res) => {
   const { id_customer } = req.params;
-  const { name, email, phone, address, complement, cep, district, city, uf } =
+  const { name, email, phone, adress, complement, cep, district, city, uf } =
     req.body;
 
   if (
     !name &&
     !email &&
     !phone &&
-    !address &&
+    !adress &&
     !complement &&
     !cep &&
     !district &&
     !city &&
     !uf
   ) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "é necessário informar ao menos um campo para fazer a atualização do cliente",
-      });
+    return res.status(400).json({
+      error:
+        "é necessário informar ao menos um campo para fazer a atualização do cliente",
+    });
   }
 
   try {
@@ -326,9 +337,9 @@ const customerUpdate = async (req, res) => {
 
     return res
       .status(200)
-      .json({ 'message': "atualização do cliente concluída com sucesso" });
+      .json({ message: "atualização do cliente concluída com sucesso" });
   } catch (error) {
-    return res.status(400).json({ 'message': error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 

@@ -16,6 +16,7 @@ const {
   customerUpdate,
 } = require("./controllers/customers");
 const {
+  collectionHighlights,
   totalAmountAllCharges,
   highlightsOverdueCollections,
   allOverdueCharges,
@@ -37,13 +38,14 @@ const routes = express();
 routes.post("/signup", registerUser);
 routes.post("/login", login);
 
-routes.use(checkLogin);
+// routes.use(checkLogin);
 
 routes.get("/user", informationToTheUserHimself);
 routes.patch("/user/updateUser", updateUser);
 
 routes.get("/totalAmountAllCharges", totalAmountAllCharges);
 
+routes.get("/collectionHighlights", collectionHighlights);
 routes.get("/highlightsOverdueCollections", highlightsOverdueCollections);
 routes.get("/allOverdueCharges", allOverdueCharges);
 routes.get("/highlightsExpectedCharges", highlightsExpectedCharges);

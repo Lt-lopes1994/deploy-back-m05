@@ -6,6 +6,73 @@ const billingEditSchema = require("../validations/billingEditSchema");
 
 const currentMoment = () => new Date();
 
+const collectionHighlights = async (req, res) => {
+  try {
+    let paidHighlights = await knex
+      .select("clients.name", "charges.id as id_charge", "value", "client_id")
+      .from("charges")
+      .leftJoin("clients", "clients.id", "charges.client_id")
+      .where("paid", "=", true)
+      .limit(4);
+
+    if (!paidHighlights || paidHighlights.length === 0) {
+      paidHighlights = [];
+    }
+
+    paidHighlights.map((highlight) => {
+      {
+        highlight.value = (highlight.value / 100).toFixed(2).replace(".", ",");
+      }
+    });
+
+    let predictedHighlight = await knex
+      .select("clients.name", "charges.id as id_charge", "value", "client_id")
+      .from("charges")
+      .leftJoin("clients", "clients.id", "charges.client_id")
+      .where("paid", "=", false)
+      .where("due_date", ">", currentMoment())
+      .limit(4);
+
+    if (!predictedHighlight || predictedHighlight.length === 0) {
+      predictedHighlight = [];
+    }
+
+    predictedHighlight.map((highlight) => {
+      {
+        highlight.value = (highlight.value / 100).toFixed(2).replace(".", ",");
+      }
+    });
+
+    let expiredHighlight = await knex
+      .select("clients.name", "charges.id as id_charge", "value", "client_id")
+      .from("charges")
+      .leftJoin("clients", "clients.id", "charges.client_id")
+      .where("paid", "=", false)
+      .where("due_date", "<", currentMoment())
+      .limit(4);
+
+    if (!expiredHighlight || expiredHighlight.length === 0) {
+      expiredHighlight = [];
+    }
+
+    expiredHighlight.map((highlight) => {
+      {
+        highlight.value = (highlight.value / 100).toFixed(2).replace(".", ",");
+      }
+    });
+
+    const highlightsCharges = {
+      paidHighlights: paidHighlights,
+      predictedHighlight: predictedHighlight,
+      expiredHighlight: expiredHighlight,
+    };
+
+    return res.status(200).json(highlightsCharges);
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
 const totalAmountAllCharges = async (req, res) => {
   try {
     let totalAmountBillsPaid = await knex("charges")
@@ -82,7 +149,7 @@ const totalAmountAllCharges = async (req, res) => {
 const highlightsOverdueCollections = async (req, res) => {
   try {
     const expiredHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "clients_id")
+      .select("clients.name", "charges.id as id_charge", "value", "client_id")
       .from("charges")
       .leftJoin("clients", "clients.id", "charges.user_id")
       .where("paid", "=", false)
@@ -108,14 +175,14 @@ const highlightsOverdueCollections = async (req, res) => {
 const allOverdueCharges = async (req, res) => {
   try {
     const expiredHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "clients_id")
+      .select("clients.name", "charges.id as id_charge", "value", "client_id")
       .from("charges")
       .leftJoin("clients", "clients.id", "charges.client_id")
       .where("paid", "=", false)
       .where("due_date", "<", currentMoment());
 
     if (!expiredHighlight || expiredHighlight.length === 0) {
-      return res.status(400).json(errors.noReturnOverdueCharges);
+      return res.status(200).json([]);
     }
     expiredHighlight.map((highlight) => {
       {
@@ -131,7 +198,7 @@ const allOverdueCharges = async (req, res) => {
 const highlightsExpectedCharges = async (req, res) => {
   try {
     const predictedHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "clients_id")
+      .select("clients.name", "charges.id as id_charge", "value", "client_id")
       .from("charges")
       .leftJoin("clients", "clients.id", "charges.user_id")
       .where("paid", "=", false)
@@ -155,10 +222,10 @@ const allAnticipatedCharges = async (req, res) => {
       .from("charges")
       .leftJoin("clients", "clients.id", "charges.client_id")
       .where("paid", "=", false)
-      .where("due_date", "<", currentMoment());
+      .where("due_date", ">", currentMoment());
 
     if (!predictedHighlight || predictedHighlight.length === 0) {
-      return res.status(400).json(errors.noReturnAnticipatedCharges);
+      return res.status(400).json([]);
     }
 
     predictedHighlight.map((highlight) => {
@@ -178,8 +245,9 @@ const highlightsPaidCharges = async (req, res) => {
     const paidHighlights = await knex
       .select("clients.name", "charges.id as id_charge", "value", "client_id")
       .from("charges")
-      .leftJoin("clients", "clients.id", "charges.user_id")
+      .leftJoin("clients", "clients.id", "charges.client_id")
       .where("paid", "=", true)
+      .distinctOn("client_id")
       .limit(4);
 
     if (!paidHighlights || paidHighlights.length === 0) {
@@ -206,7 +274,7 @@ const allChargesPaid = async (req, res) => {
       .where("paid", "=", true);
 
     if (!paidHighlights || paidHighlights.length === 0) {
-      return res.status(400).json(errors.noReturnBillsPaid);
+      return res.status(400).json([]);
     }
 
     return res.status(200).json(paidHighlights);
@@ -239,7 +307,14 @@ const billingRegister = async (req, res) => {
     }
 
     const newCharge = await knex("charges")
-      .insert({ user_id, client_id, value, paid: status, due_date })
+      .insert({
+        user_id,
+        client_id,
+        value,
+        paid: status,
+        due_date,
+        description,
+      })
       .returning("*");
 
     if (!newCharge) {
@@ -295,7 +370,7 @@ const billingList = async (req, res) => {
       return charge;
     });
 
-    return res.status(200).json({ data: listCharges });
+    return res.status(200).json(listCharges);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -437,9 +512,7 @@ const billingDetails = async (req, res) => {
 };
 
 module.exports = {
-  /*chargesPaid,
-  overdueCharges,
-  anticipatedCharges,*/
+  collectionHighlights,
   totalAmountAllCharges,
   highlightsOverdueCollections,
   allOverdueCharges,
