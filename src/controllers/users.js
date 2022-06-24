@@ -25,6 +25,8 @@ const registerUser = async (req, res) => {
     const hash = await bcrypt.hash(password.trim(), SALT);
 
     const addUser = await knex("users").insert({ name, email, password: hash });
+
+    return res.status(201).json();
   } catch {
     return res.status(400).json(error.message);
   }
