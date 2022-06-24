@@ -7,7 +7,7 @@ const usersTemplate = require("../templates/usersTemplate");
 const userUpdateSchema = require("../validations/userUpdateSchema");
 const messages = require("../scripts/messages");
 
-const { errors } = require("../scripts/error-messages");
+const errors = require("../scripts/error-messages");
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -27,7 +27,7 @@ const registerUser = async (req, res) => {
     const addUser = await knex("users").insert({ name, email, password: hash });
 
     return res.status(201).json();
-  } catch {
+  } catch (error) {
     return res.status(400).json(error.message);
   }
 };
