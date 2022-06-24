@@ -82,7 +82,7 @@ const totalAmountAllCharges = async (req, res) => {
 const highlightsOverdueCollections = async (req, res) => {
   try {
     const expiredHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "client_id")
+      .select("clients.name", "charges.id as id_charge", "value", "clients_id")
       .from("charges")
       .leftJoin("clients", "clients.id", "charges.user_id")
       .where("paid", "=", false)
@@ -108,9 +108,9 @@ const highlightsOverdueCollections = async (req, res) => {
 const allOverdueCharges = async (req, res) => {
   try {
     const expiredHighlight = await knex
-      .select("client.name", "charges.id as id_charge", "value", "client_id")
+      .select("clients.name", "charges.id as id_charge", "value", "clients_id")
       .from("charges")
-      .leftJoin("client", "client.id", "charges.client_id")
+      .leftJoin("clients", "clients.id", "charges.client_id")
       .where("paid", "=", false)
       .where("due_date", "<", currentMoment());
 
@@ -131,7 +131,7 @@ const allOverdueCharges = async (req, res) => {
 const highlightsExpectedCharges = async (req, res) => {
   try {
     const predictedHighlight = await knex
-      .select("clients.name", "charges.id as id_charge", "value", "client_id")
+      .select("clients.name", "charges.id as id_charge", "value", "clients_id")
       .from("charges")
       .leftJoin("clients", "clients.id", "charges.user_id")
       .where("paid", "=", false)
@@ -151,9 +151,9 @@ const highlightsExpectedCharges = async (req, res) => {
 const allAnticipatedCharges = async (req, res) => {
   try {
     const predictedHighlight = await knex
-      .select("client.name", "charges.id as id_charge", "value")
+      .select("clients.name", "charges.id as id_charge", "value")
       .from("charges")
-      .leftJoin("client", "client.id", "charges.client_id")
+      .leftJoin("clients", "clients.id", "charges.client_id")
       .where("paid", "=", false)
       .where("due_date", "<", currentMoment());
 
@@ -200,9 +200,9 @@ const highlightsPaidCharges = async (req, res) => {
 const allChargesPaid = async (req, res) => {
   try {
     const paidHighlights = await knex
-      .select("client.name", "charges.id as id_charge", "value")
+      .select("clients.name", "charges.id as id_charge", "value")
       .from("charges")
-      .leftJoin("client", "client.id", "charges.client_id")
+      .leftJoin("clients", "clients.id", "charges.client_id")
       .where("paid", "=", true);
 
     if (!paidHighlights || paidHighlights.length === 0) {
@@ -220,11 +220,11 @@ const billingRegister = async (req, res) => {
   const { user_id, description, due_date, value, status } = req.body;
 
   if (!client_id) {
-    return res.status(400).json({ error: "informe o client_id no params" });
+    return res.status(400).json({ error: "informe o clients_id no params" });
   }
 
   try {
-    const clientExist = await knex("client").where({ id: client_id }).first();
+    const clientExist = await knex("clients").where({ id: client_id }).first();
 
     if (!clientExist) {
       return res.status(404).json({ error: "não existe esse cliente" });
@@ -262,7 +262,7 @@ const billingList = async (req, res) => {
   try {
     const charges = await knex
       .select(
-        "client.name",
+        "clients.name",
         "charges.id as id_charge",
         "value",
         "due_date",
@@ -270,7 +270,7 @@ const billingList = async (req, res) => {
         "paid"
       )
       .from("charges")
-      .leftJoin("client", "client.id", "charges.client_id")
+      .leftJoin("clients", "clients.id", "charges.client_id")
       .limit(9)
       .offset(off);
 
@@ -359,8 +359,8 @@ const deleteCharge = async (req, res) => {
       return res.status(404).json({ error: "cobrança não encontrada" });
     }
 
-    const customerExists = await knex("client")
-      .where("client.id", "=", id_customer)
+    const customerExists = await knex("clients")
+      .where("clients.id", "=", id_customer)
       .first();
 
     if (!customerExists || customerExists.length === 0) {
@@ -405,7 +405,7 @@ const billingDetails = async (req, res) => {
         "paid"
       )
       .from("charges")
-      .leftJoin("client", "client.id", "charges.client_id")
+      .leftJoin("clients", "clients.id", "charges.client_id")
       .where("charges.id", "=", id_charge)
       .first();
 
