@@ -1,13 +1,8 @@
 const bcrypt = require("bcrypt");
-
 const knex = require("../scripts/conection");
-const userSchema = require("../validations/userSchema");
-const fieldsToUser = require("../validations/requiredFields");
-const usersTemplate = require("../templates/usersTemplate");
-const userUpdateSchema = require("../validations/userUpdateSchema");
+const errors = require("../scripts/error-messages");
 const messages = require("../scripts/messages");
-
-const { errors } = require("../scripts/error-messages");
+const fieldsToUser = require("../validations/requiredFields");
 
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
@@ -18,63 +13,77 @@ const registerUser = async (req, res) => {
     const getEmail = await knex("users").where({ email }).first();
 
     if (getEmail) {
-      return res.status(400).json(errors.userExists);
+      return res.status(400).json({ error: errors.userExists });
     }
 
     const SALT = 10;
-    const hash = await bcrypt.hash(password.trim(), SALT);
+    const hash = await bcrypt.hash(password, SALT);
 
     const addUser = await knex("users").insert({ name, email, password: hash });
-  } catch {
-    return res.status(400).json(error.message);
+
+    if (!addUser) {
+      return res.status(400).json({ error: errors.couldNotSignin });
+    }
+
+    return res
+      .status(201)
+      .json({ message: messages.userRegisteredSuccessfully });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
   }
 };
 
 const informationToTheUserHimself = async (req, res) => {
-  return res.status(200).json(req.user);
+  const userLogin = req.user;
+
+  try {
+    const user = await knex("users").where({ id: userLogin.id }).first();
+
+    if (!user) {
+      return res.status(404).json({ error: errors.userNotFound });
+    }
+
+    return res.status(200).json({ data: user });
+  } catch (error) {
+    return res.status(400).json({ message: error.message });
+  }
 };
 
 const updateUser = async (req, res) => {
-  const { id } = req.user;
-  const { name, email, cpf, phone, password } = req.body;
-
-  if (!name && !email && !phone && !cpf && !password) {
-    return res.status(400).json({
-      error:
-        "é necessário informar ao menos um campo para fazer a atualização do usuário",
-    });
-  }
+  const userLogin = req.user;
+  const { name, cpf, email, phone, password } = req.body;
 
   try {
-    await userUpdateSchema.validate(req.body);
+    const user = await knex("users")
+      .select("id", "name", "email", "cpf", "phone", "password")
+      .where({ id: userLogin.id })
+      .first();
 
-    const userExists = await knex("users").where("users.id", "=", id).first();
-
-    if (!userExists || userExists.length === 0) {
-      return res.status(404).json({ message: "usuário não encontrado" });
+    if (!user) {
+      return res.status(404).json({ error: errors.userNotFound });
     }
 
-    if (email) {
-      const checkEmail = await knex("users").where({ email }).first();
+    const getEmail = await knex("users")
+      .where({ email })
+      .whereNot({ email: user.email })
+      .first();
 
-      if (checkEmail) {
-        return res.status(400).json({ message: "email já cadastrado" });
-      }
+    if (getEmail) {
+      return res.status(400).json({ error: errors.userExists });
     }
 
-    const userEdition = await knex("users")
-      .update(req.body)
-      .where("users.id", "=", id);
+    const SALT = 10;
+    const hash = await bcrypt.hash(password, SALT);
 
-    if (!userEdition || userEdition.length === 0) {
-      return res
-        .status(400)
-        .json({ message: "não foi possível atualizar o usuário" });
+    const updatedUser = await knex("users")
+      .update({ name, email, cpf, phone, password: hash })
+      .where({ id: userLogin.id });
+
+    if (!updatedUser) {
+      return res.status(400).json({ error: errors.userUpdate });
     }
 
-    return res
-      .status(200)
-      .json({ message: "atualização do usuário concluída com sucesso" });
+    return res.status(204).json();
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -90,18 +99,18 @@ const deleteUser = async (req, res) => {
       .first();
 
     if (!user) {
-      return res.status(404).json(errors.userNotFound);
+      return res.status(404).json({ error: errors.userNotFound });
     }
 
     const deletedUser = await knex("users").del().where({ id: userLogin.id });
 
     if (!deletedUser) {
-      return res.status(400).json(errors.userDelete);
+      return res.status(400).json({ error: errors.userDelete });
     }
 
     return res.status(204).json();
   } catch (error) {
-    return res.status(400).json(error.message);
+    return res.status(400).json({ message: error.message });
   }
 };
 
