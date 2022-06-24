@@ -6,69 +6,6 @@ const billingEditSchema = require("../validations/billingEditSchema");
 
 const currentMoment = () => new Date();
 
-/*const chargesPaid = async (req, res) => {
-  try {
-    const totalAmountBillsPaid = await knex("charges")
-      .select(knex.raw(`sum(value) as total_amount_bills_paid`))
-      .where("paid", "=", true)
-      .first();
-
-    if (
-      Number(totalAmountBillsPaid.total_amount_bills_paid) === 0 ||
-      !totalAmountBillsPaid.total_amount_bills_paid
-    ) {
-      return res.status(200).json(0);
-    }
-
-    return res.status(200).json(totalAmountBillsPaid);
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
-  }
-};
-
-const overdueCharges = async (req, res) => {
-  try {
-    const totalAmountOverdueCharges = await knex("charges")
-      .select(knex.raw(`sum(value) as total_amount_overdue_charges`))
-      .where("paid", "=", false)
-      .where("due_date", "<", currentMoment())
-      .first();
-
-    if (
-      Number(totalAmountOverdueCharges.total_amount_overdue_charges) === 0 ||
-      !totalAmountOverdueCharges.total_amount_overdue_charges
-    ) {
-      return res.status(200).json(0);
-    }
-
-    return res.status(200).json(totalAmountOverdueCharges);
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
-  }
-};
-
-const anticipatedCharges = async (req, res) => {
-  try {
-    const totalAmountExpectedAccounts = await knex("charges")
-      .select(knex.raw(`sum(value) as total_amount_expected_accounts`))
-      .where("paid", "=", false)
-      .where("due_date", ">", currentMoment())
-      .first();
-
-    if (
-      Number(totalAmountExpectedAccounts.total_amount_expected_accounts) ===
-      0 ||
-      !totalAmountExpectedAccounts.total_amount_expected_accounts
-    ) {
-      return res.status(200).json(0);
-    }
-
-    return res.status(200).json(totalAmountExpectedAccounts);
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
-  }
-};*/
-
 const totalAmountAllCharges = async (req, res) => {
   try {
     let totalAmountBillsPaid = await knex("charges")
@@ -104,36 +41,43 @@ const totalAmountAllCharges = async (req, res) => {
 
     if (
       Number(totalAmountExpectedAccounts.total_amount_expected_accounts) ===
-      0 ||
+        0 ||
       !totalAmountExpectedAccounts.total_amount_expected_accounts
     ) {
       totalAmountExpectedAccounts.total_amount_expected_accounts = 0;
     }
 
-    (totalAmountBillsPaid.total_amount_bills_paid = (totalAmountBillsPaid.total_amount_bills_paid / 100)
+    totalAmountBillsPaid.total_amount_bills_paid = (
+      totalAmountBillsPaid.total_amount_bills_paid / 100
+    )
       .toFixed(2)
-      .replace('.', ','));
+      .replace(".", ",");
 
-    (totalAmountExpectedAccounts.total_amount_expected_accounts = (totalAmountExpectedAccounts.total_amount_expected_accounts / 100)
+    totalAmountExpectedAccounts.total_amount_expected_accounts = (
+      totalAmountExpectedAccounts.total_amount_expected_accounts / 100
+    )
       .toFixed(2)
-      .replace('.', ','));
+      .replace(".", ",");
 
-    (totalAmountOverdueCharges.total_amount_overdue_charges = (totalAmountOverdueCharges.total_amount_overdue_charges / 100)
+    totalAmountOverdueCharges.total_amount_overdue_charges = (
+      totalAmountOverdueCharges.total_amount_overdue_charges / 100
+    )
       .toFixed(2)
-      .replace('.', ','));
+      .replace(".", ",");
 
     const valueCollections = {
       totalAmountBillsPaid: totalAmountBillsPaid.total_amount_bills_paid,
-      totalAmountExpectedAccounts: totalAmountExpectedAccounts.total_amount_expected_accounts,
-      totalAmountOverdueCharges: totalAmountOverdueCharges.total_amount_overdue_charges
+      totalAmountExpectedAccounts:
+        totalAmountExpectedAccounts.total_amount_expected_accounts,
+      totalAmountOverdueCharges:
+        totalAmountOverdueCharges.total_amount_overdue_charges,
     };
 
     return res.status(200).json(valueCollections);
   } catch (error) {
-    return res.status(400).json({ 'message': error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
-
 
 const highlightsOverdueCollections = async (req, res) => {
   try {
@@ -362,12 +306,10 @@ const billingEdit = async (req, res) => {
   const { description, paid, value, due_date } = req.body;
 
   if (!description && !paid && !value && !due_date) {
-    return res
-      .status(400)
-      .json({
-        error:
-          "é necessário informar ao menos um campo para fazer a atualização da cobrança",
-      });
+    return res.status(400).json({
+      error:
+        "é necessário informar ao menos um campo para fazer a atualização da cobrança",
+    });
   }
   try {
     await billingEditSchema.validate(req.body);
@@ -426,12 +368,10 @@ const deleteCharge = async (req, res) => {
     }
 
     if (chargeExists.paid || chargeExists.due_date < currentMoment()) {
-      return res
-        .status(400)
-        .json({
-          error:
-            "a cobrança não pode ser deletada ou por estar vencida ou por estar paga",
-        });
+      return res.status(400).json({
+        error:
+          "a cobrança não pode ser deletada ou por estar vencida ou por estar paga",
+      });
     }
 
     const deleteAccount = await knex("charges")
