@@ -225,7 +225,7 @@ const allAnticipatedCharges = async (req, res) => {
       .where("due_date", ">", currentMoment());
 
     if (!predictedHighlight || predictedHighlight.length === 0) {
-      return res.status(400).json([]);
+      return res.status(200).json([]);
     }
 
     predictedHighlight.map((highlight) => {
@@ -274,7 +274,7 @@ const allChargesPaid = async (req, res) => {
       .where("paid", "=", true);
 
     if (!paidHighlights || paidHighlights.length === 0) {
-      return res.status(400).json([]);
+      return res.status(200).json([]);
     }
 
     return res.status(200).json(paidHighlights);

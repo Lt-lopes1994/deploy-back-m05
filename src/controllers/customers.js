@@ -2,8 +2,8 @@ const knex = require("../scripts/conection");
 const { format } = require("date-fns");
 const registerCustomerSchema = require("../validations/registerCustomerSchema");
 const customerUpdateSchema = require("../validations/customerUpdateSchema");
-const { errors } = require("../scripts/error-messages");
-const { messages } = require("../scripts/messages");
+const errors = require("../scripts/error-messages");
+const messages = require("../scripts/messages");
 
 const registerCustomer = async (req, res) => {
   const {
@@ -87,7 +87,7 @@ const allDelinquentCustomers = async (req, res) => {
       .distinctOn("clients.id");
 
     if (!sampleDelinquentCustomers || sampleDelinquentCustomers.length === 0) {
-      return res.status(400).json([]);
+      return res.status(200).json([]);
     }
 
     const dueDateFormat = sampleDelinquentCustomers.map((delinquent) => {
