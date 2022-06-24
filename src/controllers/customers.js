@@ -3,6 +3,7 @@ const { format } = require("date-fns");
 const registerCustomerSchema = require("../validations/registerCustomerSchema");
 const customerUpdateSchema = require("../validations/customerUpdateSchema");
 const { errors } = require("../scripts/error-messages");
+const { messages } = require("../scripts/messages");
 
 const registerCustomer = async (req, res) => {
   const {
