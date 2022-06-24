@@ -33,26 +33,17 @@ const registerCustomer = async (req, res) => {
       return res.status(400).json(errors.cpfExists);
     }
 
-    const customer = await knex("clients").insert({
-      name,
-      email,
-      cpf,
-      phone,
-      adress,
-      cep,
-      complement,
-      district,
-      city,
-      uf,
-    });
+    const customer = await knex("clients").insert(req.body);
 
     if (!customer) {
       return res.status(400).json(errors.unregisteredCustomer);
     }
 
-    return res.status(200).json({ mensagem: "Cliente cadastrado com sucesso" });
+    return res
+      .status(200)
+      .json({ message: messages.clientRegisteredSuccessfully });
   } catch (error) {
-    return res.status(400).json({ mensagem: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
