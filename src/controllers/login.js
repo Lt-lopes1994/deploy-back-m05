@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 const loginSchema = require("../validations/loginSchema");
 const knex = require("../scripts/conection");
-const { errors } = require("../scripts/error-messages");
+const errors = require("../scripts/error-messages");
 
 const login = async (req, res) => {
   const { email, password } = req.body;

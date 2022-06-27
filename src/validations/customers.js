@@ -2,7 +2,7 @@ const knex = require("../scripts/conection");
 const { format } = require("date-fns");
 const registerCustomerSchema = require("../validations/registerCustomerSchema");
 const customerUpdateSchema = require("../validations/customerUpdateSchema");
-const { errors } = require("../scripts/error-messages");
+const errors = require("../scripts/error-messages");
 
 const registerCustomer = async (req, res) => {
   const {

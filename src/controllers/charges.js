@@ -1,6 +1,6 @@
 const knex = require("../scripts/conection");
 const { format } = require("date-fns");
-const { errors } = require("../scripts/error-messages");
+const errors = require("../scripts/error-messages");
 const billingRegisterSchema = require("../validations/billingRegisterSchema");
 const billingEditSchema = require("../validations/billingEditSchema");
 
