@@ -2,7 +2,7 @@ const knex = require("../scripts/conection");
 const { format } = require("date-fns");
 const registerCustomerSchema = require("../validations/registerCustomerSchema");
 const customerUpdateSchema = require("../validations/customerUpdateSchema");
-const { errors } = require("../scripts/error-messages");
+const errors = require("../scripts/error-messages");
 
 const registerCustomer = async (req, res) => {
   const {
@@ -67,7 +67,7 @@ const delinquentCustomerHighligths = async (req, res) => {
       return delinquent;
     });
 
-    return res.status(200).json({ data: dueDateFormat });
+    return res.status(200).json(dueDateFormat);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -121,7 +121,7 @@ const highlightsCustomersUpToDate = async (req, res) => {
       return delinquent;
     });
 
-    return res.status(200).json({ data: dueDateFormat });
+    return res.status(200).json(dueDateFormat);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
@@ -191,7 +191,7 @@ const customers = async (req, res) => {
       customersData.push(customer);
     }
 
-    return res.status(200).json({ data: customersData });
+    return res.status(200).json(customersData);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }

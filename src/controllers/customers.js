@@ -2,7 +2,8 @@ const knex = require("../scripts/conection");
 const { format } = require("date-fns");
 const registerCustomerSchema = require("../validations/registerCustomerSchema");
 const customerUpdateSchema = require("../validations/customerUpdateSchema");
-const { errors } = require("../scripts/error-messages");
+const errors = require("../scripts/error-messages");
+const messages = require("../scripts/messages");
 
 const registerCustomer = async (req, res) => {
   const {
@@ -33,26 +34,17 @@ const registerCustomer = async (req, res) => {
       return res.status(400).json(errors.cpfExists);
     }
 
-    const customer = await knex("clients").insert({
-      name,
-      email,
-      cpf,
-      phone,
-      adress,
-      cep,
-      complement,
-      district,
-      city,
-      uf,
-    });
+    const customer = await knex("clients").insert(req.body);
 
     if (!customer) {
       return res.status(400).json(errors.unregisteredCustomer);
     }
 
-    return res.status(200).json({ mensagem: "Cliente cadastrado com sucesso" });
+    return res
+      .status(200)
+      .json({ message: messages.clientRegisteredSuccessfully });
   } catch (error) {
-    return res.status(400).json({ mensagem: error.message });
+    return res.status(400).json({ message: error.message });
   }
 };
 
@@ -95,7 +87,7 @@ const allDelinquentCustomers = async (req, res) => {
       .distinctOn("clients.id");
 
     if (!sampleDelinquentCustomers || sampleDelinquentCustomers.length === 0) {
-      return res.status(400).json([]);
+      return res.status(200).json([]);
     }
 
     const dueDateFormat = sampleDelinquentCustomers.map((delinquent) => {
@@ -103,7 +95,7 @@ const allDelinquentCustomers = async (req, res) => {
       return delinquent;
     });
 
-    return res.status(200).json({ data: dueDateFormat });
+    return res.status(200).json(dueDateFormat);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
