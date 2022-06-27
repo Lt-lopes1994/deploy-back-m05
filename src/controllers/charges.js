@@ -505,7 +505,7 @@ const billingDetails = async (req, res) => {
     chargeExists.due_date = format(chargeExists.due_date, "dd-MM-yyyy");
     delete chargeExists.paid;
 
-    return res.status(200).json({ data: chargeExists });
+    return res.status(200).json(chargeExists);
   } catch (error) {
     return res.status(400).json({ error: error.message });
   }

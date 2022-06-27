@@ -95,7 +95,7 @@ const allDelinquentCustomers = async (req, res) => {
       return delinquent;
     });
 
-    return res.status(200).json({ data: dueDateFormat });
+    return res.status(200).json(dueDateFormat);
   } catch (error) {
     return res.status(400).json({ message: error.message });
   }
